@@ -1,0 +1,28 @@
+import { defineArea } from '../area'
+
+// 並び: ja, en, ko, de, fr, es, zh, pt, it, ru
+export default defineArea({
+  'footer.updates': ['更新情報', 'Updates', '업데이트 정보', 'Neuigkeiten', 'Nouveautés', 'Novedades', '更新信息', 'Novidades', 'Novità', 'Обновления'],
+  'footer.policy': ['ポリシー', 'Privacy Policy', '개인정보 처리방침', 'Datenschutz', 'Confidentialité', 'Privacidad', '隐私政策', 'Privacidade', 'Privacy', 'Конфиденциальность'],
+  'footer.terms': ['利用規約', 'Terms of Service', '이용약관', 'Nutzungsbedingungen', "Conditions d'utilisation", 'Términos de uso', '使用条款', 'Termos de uso', 'Termini di servizio', 'Условия использования'],
+  'footer.status': ['ステータス', 'Status', '서비스 상태', 'Status', 'État du service', 'Estado del servicio', '服务状态', 'Status do serviço', 'Stato del servizio', 'Статус сервиса'],
+  'footer.dev': ['開発者情報', 'Developer', '개발자 정보', 'Entwickler', 'Développeur', 'Desarrollador', '开发者信息', 'Desenvolvedor', 'Sviluppatore', 'Разработчик'],
+  'footer.build': ['ビルドバージョン', 'Build version', '빌드 버전', 'Build-Version', 'Version du build', 'Versión de compilación', '构建版本', 'Versão da build', 'Versione build', 'Версия сборки'],
+  'save.saving': ['保存中', 'Saving', '저장 중', 'Speichern …', 'Enregistrement', 'Guardando', '保存中', 'Salvando', 'Salvataggio', 'Сохранение'],
+  'save.done': ['保存しました', 'Saved', '저장했습니다', 'Gespeichert', 'Enregistré', 'Guardado', '已保存', 'Salvo', 'Salvato', 'Сохранено'],
+  'tab.theme': ['テーマ', 'Theme', '테마', 'Design', 'Thème', 'Tema', '主题', 'Tema', 'Tema', 'Тема'],
+  'theme.saved': ['設定はアカウントに保存され、ログインしたどのブラウザにも反映されます。', 'Settings are saved to your account and apply in any browser you log in with.', '설정은 계정에 저장되어 로그인한 모든 브라우저에 적용됩니다.', 'Die Einstellungen werden in deinem Konto gespeichert und gelten in jedem Browser, in dem du dich anmeldest.', "Les réglages sont enregistrés sur votre compte et s'appliquent dans tout navigateur où vous vous connectez.", 'Los ajustes se guardan en tu cuenta y se aplican en cualquier navegador donde inicies sesión.', '设置会保存到您的账号，在任何登录的浏览器中都会生效。', 'As configurações são salvas na sua conta e valem em qualquer navegador em que você entrar.', 'Le impostazioni vengono salvate nel tuo account e valgono in qualsiasi browser in cui accedi.', 'Настройки сохраняются в вашем аккаунте и применяются в любом браузере, где вы вошли.'],
+  'theme.guest': ['ログインすると設定をアカウントに保存し、どのブラウザでも共通にできます。', 'Log in to save these settings to your account and use them in any browser.', '로그인하면 설정을 계정에 저장하여 어느 브라우저에서나 동일하게 사용할 수 있습니다.', 'Melde dich an, um die Einstellungen in deinem Konto zu speichern und in jedem Browser zu nutzen.', 'Connectez-vous pour enregistrer ces réglages sur votre compte et les utiliser dans tout navigateur.', 'Inicia sesión para guardar estos ajustes en tu cuenta y usarlos en cualquier navegador.', '登录后可将设置保存到账号，在任何浏览器中通用。', 'Entre para salvar estas configurações na sua conta e usá-las em qualquer navegador.', 'Accedi per salvare queste impostazioni nel tuo account e usarle in qualsiasi browser.', 'Войдите, чтобы сохранить настройки в аккаунте и использовать их в любом браузере.'],
+  'theme.appearance': ['外観', 'Appearance', '외관', 'Erscheinungsbild', 'Apparence', 'Apariencia', '外观', 'Aparência', 'Aspetto', 'Оформление'],
+  'theme.light': ['ライト', 'Light', '라이트', 'Hell', 'Clair', 'Claro', '浅色', 'Claro', 'Chiaro', 'Светлая'],
+  'theme.dark': ['ダーク', 'Dark', '다크', 'Dunkel', 'Sombre', 'Oscuro', '深色', 'Escuro', 'Scuro', 'Тёмная'],
+  'theme.accent': ['アクセントカラー', 'Accent color', '강조 색상', 'Akzentfarbe', "Couleur d'accent", 'Color de énfasis', '强调色', 'Cor de destaque', 'Colore di risalto', 'Акцентный цвет'],
+  'theme.font': ['文字サイズ', 'Text size', '글자 크기', 'Schriftgröße', 'Taille du texte', 'Tamaño del texto', '文字大小', 'Tamanho do texto', 'Dimensione del testo', 'Размер текста'],
+  'theme.fontDesc': ['文字とそれに連動する余白・各パーツの大きさが変わります。', 'Changes the text size and the spacing and parts that scale with it.', '글자와 함께 여백 및 각 요소의 크기가 바뀝니다.', 'Ändert die Schrift sowie die damit skalierenden Abstände und Elemente.', "Modifie le texte ainsi que les espacements et éléments qui s'adaptent.", 'Cambia el texto y los espacios y elementos que se escalan con él.', '文字大小会同时影响与之联动的间距和各组件的大小。', 'Altera o texto e os espaçamentos e elementos que acompanham seu tamanho.', 'Cambia il testo e gli spazi ed elementi che si adattano con esso.', 'Меняет размер текста, а также связанные с ним отступы и элементы.'],
+  'theme.radius': ['角の丸み', 'Corner radius', '모서리 둥글기', 'Eckenradius', 'Arrondi des coins', 'Radio de las esquinas', '圆角', 'Arredondamento dos cantos', 'Raggio degli angoli', 'Скругление углов'],
+  'theme.motion': ['アニメーション', 'Animations', '애니메이션', 'Animationen', 'Animations', 'Animaciones', '动画', 'Animações', 'Animazioni', 'Анимации'],
+  'theme.motionDesc': ['オフにすると画面の動きや切り替え効果を止めます。', 'Turn off to stop on-screen motion and transition effects.', '끄면 화면의 움직임과 전환 효과가 멈춥니다.', 'Wenn deaktiviert, werden Bewegungen und Übergangseffekte gestoppt.', "Désactivez pour arrêter les mouvements et effets de transition à l'écran.", 'Desactívalas para detener el movimiento y los efectos de transición.', '关闭后将停止界面的动态和切换效果。', 'Desative para parar o movimento e os efeitos de transição na tela.', 'Disattiva per fermare i movimenti e gli effetti di transizione.', 'Отключите, чтобы остановить движение и эффекты перехода на экране.'],
+  'common.on': ['オン', 'On', '켜기', 'An', 'Activé', 'Activado', '开', 'Ativado', 'Attivo', 'Вкл.'],
+  'common.off': ['オフ', 'Off', '끄기', 'Aus', 'Désactivé', 'Desactivado', '关', 'Desativado', 'Disattivato', 'Выкл.'],
+  'theme.reset': ['初期設定に戻す', 'Reset to defaults', '기본값으로 되돌리기', 'Auf Standard zurücksetzen', 'Rétablir les valeurs par défaut', 'Restablecer valores', '恢复默认设置', 'Restaurar padrão', 'Ripristina predefiniti', 'Сбросить настройки'],
+})
