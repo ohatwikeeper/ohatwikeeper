@@ -95,5 +95,5 @@ npm run lint
 
 ## ライセンス
 
-Copyright (c) 2026 おはツイKeeper (ohatwikeeper) / Lapius7. All rights reserved.
+Copyright (c) 2026 おはツイKeeper (ohatwikeeper) / 狐ノ瀬つづり. All rights reserved.
 閲覧のみ許可します。詳細は [LICENSE](./LICENSE)。
