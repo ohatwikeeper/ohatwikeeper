@@ -17,7 +17,7 @@
 > [!IMPORTANT]
 > このリポジトリは **閲覧専用(source-available ではなく "view-only")** です。
 > コードの複製・改変・再配布・商用/非商用を問わない利用は許可されていません。詳細は [LICENSE](./LICENSE) を参照してください。
-> Issue / Pull Request による貢献も受け付けていません。
+> Issue(バグ報告・要望)と Pull Request は歓迎します。詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
 ## 概要
 
