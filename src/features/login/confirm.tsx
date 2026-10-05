@@ -54,7 +54,7 @@ export default function ConfirmLoginPage() {
             <Button type="submit" disabled={busy}>{t('lg.sendCode')}</Button>
           </form>
         ) : (
-          <form className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); void run(async () => { const d = await post('verify', { csrf: reg.csrf, otp, r }); window.location.href = d.redirect }) }}>
+          <form className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); void run(async () => { const d = await post('verify', { csrf: reg.csrf, otp, r }); window.location.href = /^\/(?![\/\\])/.test(String(d.redirect)) ? d.redirect : '/dashboard' }) }}>
             <p className="text-sm text-d-text2">{t('lg.otpHint', { e: email })}</p>
             <Input inputMode="numeric" maxLength={8} required placeholder="12345678" value={otp} onChange={(e) => setOtp(e.target.value)} />
             <Button type="submit" disabled={busy}>{t('lg.register')}</Button>
