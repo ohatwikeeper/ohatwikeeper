@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { OtpField } from '@/components/ui/otp-field'
 
-type Res = { ok: boolean; message?: string; email?: string; pending?: string | null }
+type Res = { ok: boolean; message?: string; email?: string; pending?: string | null; resend_after?: number }
 
 const call = async (body: object): Promise<Res & { status: number }> => {
   const r = await fetch('/app-api/email_change', {
@@ -29,13 +29,12 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
-  const [wait, setWait] = useState(60)
+  const [wait, setWait] = useState(0)
 
   useEffect(() => {
-    call({ action: 'status' }).then((d) => { setCurrent(d.email ?? ''); setPending(d.pending ?? null) })
+    call({ action: 'status' }).then((d) => { setCurrent(d.email ?? ''); setPending(d.pending ?? null); setWait(d.resend_after ?? 0) })
   }, [])
 
-  useEffect(() => { if (pending) setWait(60) }, [pending])
   useEffect(() => {
     if (!pending || wait <= 0) return
     const id = setTimeout(() => setWait((w) => w - 1), 1000)
@@ -55,7 +54,7 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
         {error && <div className="mb-4 rounded-lg border border-d-danger/40 bg-d-danger/10 px-3 py-2 text-sm text-d-danger">{error}</div>}
 
         {!pending ? (
-          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'request_change', new_email: email }, (d) => { setPending(d.email ?? email); toast.success(d.message) }) }}>
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'request_change', new_email: email }, (d) => { setPending(d.email ?? email); setWait(d.resend_after ?? 60); toast.success(d.message) }) }}>
             <label className="block text-xs font-semibold text-d-text2">{t('em.newLabel')}</label>
             <Input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
             <Button type="submit" disabled={busy || !email} className="w-full">{busy ? t('st.sending') : t('em.sendOtp')}</Button>
@@ -66,7 +65,7 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
             <OtpField value={otp} onChange={setOtp} disabled={busy || done} success={done} />
             {done && <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400 animate-in fade-in zoom-in-95 duration-300"><CheckCircle2 className="size-5" />{t('em.done')}</div>}
             <Button type="submit" disabled={busy || done || otp.length !== 8} className="w-full"><ShieldCheck className="mr-1 size-4" />{busy ? t('em.checking') : t('em.verify')}</Button>
-            <Button type="button" variant="outline" size="sm" className="w-full" disabled={busy || done || wait > 0} onClick={() => run({ action: 'request_change', new_email: pending }, () => { setWait(60); setOtp(''); toast.success(t('em.resent')) })}><RotateCw className="mr-1 size-3.5" />{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>
+            <Button type="button" variant="outline" size="sm" className="w-full" disabled={busy || done || wait > 0} onClick={() => run({ action: 'request_change', new_email: pending }, (d) => { setWait(d.resend_after ?? 60); setOtp(''); toast.success(t('em.resent')) })}><RotateCw className="mr-1 size-3.5" />{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>
             <Button type="button" variant="ghost" size="xs" className="w-full text-d-text3" disabled={done} onClick={() => run({ action: 'cancel' }, () => { setPending(null); setOtp('') })}>{t('em.cancel')}</Button>
           </form>
         )}
