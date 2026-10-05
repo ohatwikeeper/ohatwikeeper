@@ -8,7 +8,6 @@ import { GlimmProvider } from 'glimm/react'
 // import { bindGlobalClickSounds } from '@/lib/cuelume-sound'
 import ActionWidget from '@/widgets/ActionWidget'
 import CommandPalette from '@/widgets/CommandPalette'
-import AdringWidget from '@/widgets/AdringWidget'
 import SplashCursor from '@/widgets/SplashCursor'
 import DonationBar from '@/components/dashboard-ui/DonationBar'
 import MaintenanceGate from '@/features/maintenance/MaintenanceGate'
@@ -182,7 +181,6 @@ function App() {
         <NotAdmin><ActionWidget /></NotAdmin>
         <CommandPalette />
         <OnboardGate />
-        <NotAdmin><AdringWidget /></NotAdmin>
       </GlimmProvider>
     </BrowserRouter>
   )
