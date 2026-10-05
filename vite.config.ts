@@ -8,13 +8,15 @@ import path from 'path'
 // ビルドごとに「年月日-公開リポジトリのコミットID先頭16桁」のバージョンを発行し、フッターに表示する(例: 20261005-b9cf23c5160504cc)。
 // コミットID(40桁)は公開リポジトリ(ohatwikeeper/ohatwikeeper)のもの。top/.public-commit があればそれを優先(公開側には無いので自身のHEAD)
 const ymd = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Tokyo' }).replace(/-/g, '')
+// フッターの GitHub リンク先リポジトリ名。非公開側(beta ビルド)は top/.public-repo、公開側は既定で正式版
+const repo = (() => { try { const v = readFileSync(new URL('.public-repo', import.meta.url), 'utf8').trim(); if (/^[\w.-]+$/.test(v)) return v } catch {} return 'ohatwikeeper' })()
 const commit = (() => {
   try { const v = readFileSync(new URL('.public-commit', import.meta.url), 'utf8').trim(); if (/^[0-9a-f]{40}$/.test(v)) return v } catch {}
   try { return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return '0'.repeat(40) }
 })()
 
 export default defineConfig({
-  define: { __BUILD_VERSION__: JSON.stringify(`${ymd}-${commit.slice(0, 16)}`), __BUILD_COMMIT__: JSON.stringify(commit) },
+  define: { __BUILD_REPO__: JSON.stringify(repo), __BUILD_VERSION__: JSON.stringify(`${ymd}-${commit.slice(0, 16)}`), __BUILD_COMMIT__: JSON.stringify(commit) },
   plugins: [react(), tailwindcss()],
   base: '/',
   // 遅延ロードのページ内の依存も起動時にまとめて最適化する(後から見つかって再最適化→504 Outdated Optimize Dep になるのを防ぐ)

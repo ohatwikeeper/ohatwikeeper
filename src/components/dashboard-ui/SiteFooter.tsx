@@ -20,6 +20,7 @@ const link = 'inline-flex items-center gap-1.5 whitespace-nowrap text-xs !text-d
 /** サイドバー下部のフッター(カードなし) */
 declare const __BUILD_VERSION__: string
 declare const __BUILD_COMMIT__: string
+declare const __BUILD_REPO__: string
 
 export default function SiteFooter() {
   const { t } = useTranslation()
@@ -38,7 +39,7 @@ export default function SiteFooter() {
         ))}
       </div>
       <div className="text-[11px] text-d-text3">© {new Date().getFullYear()} おはツイKeeper by 狐ノ瀬つづり</div>
-      <div className="select-text font-mono text-[10px] text-d-text3" title={t('footer.build')}><a href={`https://github.com/ohatwikeeper/ohatwikeeper/commit/${__BUILD_COMMIT__}`} target="_blank" rel="noopener noreferrer" className="hover:text-d-text2 hover:underline">{__BUILD_VERSION__}</a></div>
+      <div className="select-text font-mono text-[10px] text-d-text3" title={t('footer.build')}><a href={`https://github.com/ohatwikeeper/${__BUILD_REPO__}/commit/${__BUILD_COMMIT__}`} target="_blank" rel="noopener noreferrer" className="hover:text-d-text2 hover:underline">{__BUILD_VERSION__}</a></div>
     </footer>
   )
 }
