@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { OtpField } from '@/components/ui/otp-field'
 
 interface Reg { provider: string; username: string; email: string | null; csrf: string; invitation_required: boolean; error: string | null }
 
@@ -56,8 +57,8 @@ export default function ConfirmLoginPage() {
         ) : (
           <form className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); void run(async () => { const d = await post('verify', { csrf: reg.csrf, otp, r }); window.location.href = /^\/(?![\/\\])/.test(String(d.redirect)) ? d.redirect : '/dashboard' }) }}>
             <p className="text-sm text-d-text2">{t('lg.otpHint', { e: email })}</p>
-            <Input inputMode="numeric" maxLength={8} required placeholder="12345678" value={otp} onChange={(e) => setOtp(e.target.value)} />
-            <Button type="submit" disabled={busy}>{t('lg.register')}</Button>
+            <OtpField value={otp} onChange={setOtp} />
+            <Button type="submit" disabled={busy || otp.length < 8}>{t('lg.register')}</Button>
             <Button type="button" variant="ghost" onClick={() => setStep('email')}>{t('lg.changeEmail')}</Button>
           </form>
         )}

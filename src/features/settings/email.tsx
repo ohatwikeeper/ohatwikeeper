@@ -5,6 +5,7 @@ import { toast } from '@/lib/toast'
 import { ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { OtpField } from '@/components/ui/otp-field'
 
 type Res = { ok: boolean; message?: string; email?: string; pending?: string | null }
 
@@ -53,7 +54,7 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
         ) : (
           <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'verify_otp', otp }, (d) => { setCurrent(d.email ?? ''); setPending(null); setOtp(''); setEmail(''); toast.success(d.message); window.dispatchEvent(new Event('dashboard:reload')); onDone?.() }) }}>
             <p className="text-sm text-d-text2"><span className="font-mono">{pending}</span>{t('em.otpHint')}</p>
-            <Input inputMode="numeric" pattern="[0-9]{8}" maxLength={8} required value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="00000000" className="text-center font-mono text-lg tracking-[0.4em]" />
+            <OtpField value={otp} onChange={setOtp} />
             <Button type="submit" disabled={busy || otp.length !== 8} className="w-full"><ShieldCheck className="mr-1 size-4" />{busy ? t('em.checking') : t('em.verify')}</Button>
             <Button type="button" variant="ghost" size="xs" className="w-full text-d-text3" onClick={() => run({ action: 'cancel' }, () => { setPending(null); setOtp('') })}>{t('em.cancel')}</Button>
           </form>

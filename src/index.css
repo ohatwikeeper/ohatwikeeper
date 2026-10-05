@@ -2072,3 +2072,38 @@ html:has(.dash-scope) { scrollbar-color: var(--d-border) var(--d-bg); }
 
 /* テーマ設定「アニメーション: オフ」 */
 .dash-reduce-motion *, .dash-reduce-motion *::before, .dash-reduce-motion *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+/* kobra input-otp のアニメーション(コンポーネント側が参照するクラス。ペースト/成功時の波、確認中の揺れ) */
+@keyframes otp-trail {
+  0% { opacity: 0; transform: scale(0.92); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+@keyframes otp-bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+@keyframes otp-wave {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-2px); opacity: 0.55; }
+}
+.otp-trail {
+  background: color-mix(in oklch, var(--foreground) 14%, transparent);
+  animation: otp-trail 0.4s ease-out both;
+  animation-delay: calc(var(--otp-trail-index, 0) * 45ms);
+}
+.otp-trail-success {
+  background: color-mix(in oklch, var(--success) 28%, transparent);
+  animation: otp-trail 0.42s ease-out both;
+  animation-delay: calc(var(--otp-trail-index, 0) * 48ms);
+}
+.otp-bounce {
+  animation: otp-bounce 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--otp-trail-index, 0) * 48ms);
+}
+.otp-processing {
+  animation: otp-wave 0.9s ease-in-out infinite;
+  animation-delay: calc(var(--otp-wave-index, 0) * 80ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .otp-trail, .otp-trail-success, .otp-bounce, .otp-processing { animation: none; }
+}
