@@ -5,15 +5,16 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-// ビルドごとに「年月日-英数字8桁+コミットハッシュ7桁」のバージョンを発行し、フッターに表示する(例: 20261004-a3k9x0qz8f04f0d)
+// ビルドごとに「年月日-公開リポジトリのコミットID先頭16桁」のバージョンを発行し、フッターに表示する(例: 20261005-b9cf23c5160504cc)。
+// コミットID(40桁)は公開リポジトリ(ohatwikeeper/ohatwikeeper)のもの。top/.public-commit があればそれを優先(公開側には無いので自身のHEAD)
 const ymd = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Tokyo' }).replace(/-/g, '')
-const rand = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('')
-
-// 末尾7桁は公開リポジトリ(ohatwikeeper/ohatwikeeper)のコミットIDに揃える。top/.public-commit があればそれを優先(公開側には無いので自身のHEAD)
-const hash = (() => { try { const v = readFileSync(new URL('.public-commit', import.meta.url), 'utf8').trim(); if (/^[0-9a-f]{7}$/.test(v)) return v } catch {} try { return execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return 'nogit00' } })()
+const commit = (() => {
+  try { const v = readFileSync(new URL('.public-commit', import.meta.url), 'utf8').trim(); if (/^[0-9a-f]{40}$/.test(v)) return v } catch {}
+  try { return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return '0'.repeat(40) }
+})()
 
 export default defineConfig({
-  define: { __BUILD_VERSION__: JSON.stringify(`${ymd}-${rand}${hash}`) },
+  define: { __BUILD_VERSION__: JSON.stringify(`${ymd}-${commit.slice(0, 16)}`), __BUILD_COMMIT__: JSON.stringify(commit) },
   plugins: [react(), tailwindcss()],
   base: '/',
   // 遅延ロードのページ内の依存も起動時にまとめて最適化する(後から見つかって再最適化→504 Outdated Optimize Dep になるのを防ぐ)
