@@ -6,6 +6,7 @@ import { apiGet, friendlyError } from '@/lib/dashboard/api'
 import { copyText, fmt, shortDate } from '@/lib/dashboard/format'
 import { useFlash } from '@/lib/dashboard/hooks'
 import type { RecordItem } from '@/lib/dashboard/types'
+import { HoldToDeleteButton } from '@/components/ui/hold-to-delete-button'
 import { dbtn } from '@/components/dashboard-ui/DButton'
 import Tip from '@/components/dashboard-ui/Tip'
 import Callout from '@/components/dashboard-ui/Callout'
@@ -128,7 +129,7 @@ export default function RecordPanel({ record, index, total, onClose, onStep, onD
                     <i className={`bx ${copied ? 'bx-check' : 'bx-copy'}`} />{t('rc.urlCopy')}
                   </button>
                 )}
-                {onDelete && <Tip label={t('rc.delete')}><button type="button" className={dbtn('danger', 'ml-auto')} aria-label={t('rc.delete')} onClick={() => onDelete(r.uniqid)}><i className="bx bx-trash" /></button></Tip>}
+                {onDelete && <Tip label={t('rc.delete')}><HoldToDeleteButton label={t('rc.delHold')} className={dbtn('danger', 'ml-auto')} onDelete={() => onDelete(r.uniqid)}><i className="bx bx-trash" /></HoldToDeleteButton></Tip>}
               </div>
 
               <div className="mt-6 border-t border-d-border pt-4">

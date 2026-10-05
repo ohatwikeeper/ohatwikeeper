@@ -31,7 +31,7 @@ import { onCommand, type DashCommand } from '@/lib/commands'
 import RecordPanel from '@/features/records/RecordPanel'
 import RecordsSection from '@/features/records/RecordsSection'
 import {
-  BulkAddModal, DeleteModal, ImageModal, NotificationsModal, ProgressOverlay, SurveyModal, ZipModal,
+  BulkAddModal, ImageModal, NotificationsModal, ProgressOverlay, SurveyModal, ZipModal,
 } from '@/features/records/Modals'
 
 type Progress = { text: string; done?: number; total?: number } | null
@@ -59,7 +59,6 @@ export default function DashboardPage() {
 
   const [image, setImage] = useState<{ image: string; video: string | null } | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [zipOpen, setZipOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(true)
@@ -130,16 +129,14 @@ export default function DashboardPage() {
     }
   }
 
-  const confirmDelete = async () => {
-    if (!deleteId) return
+  const confirmDelete = async (id: string) => {
     try {
-      const r = await apiSend<{ message: string }>(`records/${deleteId}`, 'DELETE')
+      const r = await apiSend<{ message: string }>(`records/${id}`, 'DELETE')
       toast.success(r.message)
       await refreshAll()
     } catch (e) {
       toast.error(friendlyError(e))
     }
-    setDeleteId(null)
   }
 
   /** 過去1ヶ月/全件の記録を50件×3並列で更新する(dashboard.php の handleBatchUpdateProcess 相当) */
@@ -252,7 +249,7 @@ export default function DashboardPage() {
                   scheduledUpdateTime={data.scheduled_update_time}
                   onImage={(image, video) => setImage({ image, video })}
                   onTweet={setSelected}
-                  onDelete={setDeleteId}
+                  onDelete={(id) => void confirmDelete(id)}
                 />
               </>
             )}
@@ -264,10 +261,9 @@ export default function DashboardPage() {
         total={records.length}
         onClose={() => setSelected(null)}
         onStep={(d) => { const n = records[selIndex + d]; if (n) setSelected(n.uniqid) }}
-        onDelete={(id) => { setSelected(null); setDeleteId(id) }}
+        onDelete={(id) => { setSelected(null); void confirmDelete(id) }}
         onImage={(image, video) => setImage({ image, video })}
       />
-      <DeleteModal uniqid={deleteId} onClose={() => setDeleteId(null)} onConfirm={confirmDelete} />
       <BulkAddModal open={bulkOpen} onClose={() => setBulkOpen(false)} onSubmit={runBulk} />
       <ZipModal open={zipOpen} onClose={() => setZipOpen(false)} csrf={data.csrf_token} />
       <NotificationsModal items={notifOpen && obDone ? notifications : []} onClose={() => setNotifOpen(false)} />

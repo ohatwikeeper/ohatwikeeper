@@ -1,6 +1,5 @@
 import { DateRangePicker } from '@/components/arc/date-range-picker/date-range-picker'
 import { useTranslation } from 'react-i18next'
-import { motion } from 'motion/react'
 import { X } from 'lucide-react'
 import AppEmpty from '@/components/dashboard-ui/AppEmpty'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -11,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import FilterPanel from '@/components/dashboard-ui/FilterPanel'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { HoldToDeleteButton } from '@/components/ui/hold-to-delete-button'
+import { AnimatePresence, motion } from 'motion/react'
 import { dbtn } from '@/components/dashboard-ui/DButton'
 import ViewToggle from '@/features/records/ViewToggle'
 import Tip from '@/components/dashboard-ui/Tip'
@@ -61,9 +62,22 @@ function CopyXUrlButton({ url }: { url: string }) {
         const s = toOhaxUrl(url)
         if (s) copyText(s).then(flash)
       }}
-      className="inline-flex size-9 shrink-0 items-center justify-center rounded-full align-middle text-base text-d-text2 transition-colors hover:text-d-text"
+      className={`relative inline-flex size-9 shrink-0 items-center justify-center rounded-full align-middle text-base transition-colors ${ok ? 'text-emerald-400' : 'text-d-text2 hover:text-d-text'}`}
     >
-      <i className={`bx ${ok ? 'bx-check' : 'bx-copy'} pointer-events-none`} />
+      <AnimatePresence>
+        {ok && <motion.span key="ring" aria-hidden className="absolute inset-0 rounded-full border border-emerald-400" initial={{ scale: 0.6, opacity: 0.8 }} animate={{ scale: 1.5, opacity: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: 'easeOut' }} />}
+      </AnimatePresence>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.i
+          key={ok ? 'ok' : 'copy'}
+          className={`bx ${ok ? 'bx-check' : 'bx-copy'} pointer-events-none`}
+          initial={{ scale: 0.3, opacity: 0, filter: 'blur(4px)', rotate: ok ? -30 : 0 }}
+          animate={{ scale: 1, opacity: 1, filter: 'blur(0px)', rotate: 0 }}
+          exit={{ scale: 0.3, opacity: 0, filter: 'blur(4px)' }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          whileTap={{ scale: 0.85 }}
+        />
+      </AnimatePresence>
     </button>
     </Tip>
   )
@@ -126,9 +140,9 @@ function ActionButtons({ r, onDelete }: { r: RecordItem; onDelete: Props['onDele
       <CopyXUrlButton url={r.url} />
       {onDelete && (
         <Tip label={t('rc.delete')}>
-          <button type="button" aria-label={t('rc.delete')} className={dbtn('danger')} onClick={(e) => { e.stopPropagation(); onDelete(r.uniqid) }}>
+          <HoldToDeleteButton label={t('rc.delHold')} className={dbtn('danger')} onDelete={() => onDelete(r.uniqid)}>
             <i className="bx bx-trash" />
-          </button>
+          </HoldToDeleteButton>
         </Tip>
       )}
     </>

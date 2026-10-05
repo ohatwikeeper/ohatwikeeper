@@ -17,6 +17,7 @@ export default defineArea({
   'rc.fail': ['失敗', 'Failed', '실패', 'Fehler', 'Échec', 'Fallo', '失败', 'Falha', 'Errore', 'Ошибка'],
   'rc.openDetail': ['詳細ページを開く', 'Open details page', '상세 페이지 열기', 'Detailseite öffnen', 'Ouvrir la page de détails', 'Abrir página de detalles', '打开详情页', 'Abrir página de detalhes', 'Apri pagina dettagli', 'Открыть страницу сведений'],
   'rc.openOrig': ['元の投稿を見る', 'View original post', '원본 게시물 보기', 'Originalbeitrag ansehen', 'Voir le post original', 'Ver publicación original', '查看原帖', 'Ver post original', 'Vedi post originale', 'Открыть оригинал'],
+  'rc.delHold': ['長押しで削除', 'Hold to delete', '길게 눌러 삭제', 'Zum Löschen gedrückt halten', 'Maintenir pour supprimer', 'Mantén para eliminar', '长按删除', 'Segure para excluir', 'Tieni premuto per eliminare', 'Удерживайте для удаления'],
   'rc.delete': ['削除', 'Delete', '삭제', 'Löschen', 'Supprimer', 'Eliminar', '删除', 'Excluir', 'Elimina', 'Удалить'],
   'rc.flagYes': ['{{f}}あり', 'With {{f}}', '{{f}} 있음', 'Mit {{f}}', 'Avec {{f}}', 'Con {{f}}', '有{{f}}', 'Com {{f}}', 'Con {{f}}', 'С {{f}}'],
   'rc.flagNo': ['{{f}}なし', 'Without {{f}}', '{{f}} 없음', 'Ohne {{f}}', 'Sans {{f}}', 'Sin {{f}}', '无{{f}}', 'Sem {{f}}', 'Senza {{f}}', 'Без {{f}}'],
