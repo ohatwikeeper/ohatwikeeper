@@ -2,7 +2,7 @@ import i18n from '@/i18n'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
 import { toast } from '@/lib/toast'
-import { ShieldCheck } from 'lucide-react'
+import { CheckCircle2, RotateCw, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { OtpField } from '@/components/ui/otp-field'
@@ -28,10 +28,19 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
   const [otp, setOtp] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [done, setDone] = useState(false)
+  const [wait, setWait] = useState(60)
 
   useEffect(() => {
     call({ action: 'status' }).then((d) => { setCurrent(d.email ?? ''); setPending(d.pending ?? null) })
   }, [])
+
+  useEffect(() => { if (pending) setWait(60) }, [pending])
+  useEffect(() => {
+    if (!pending || wait <= 0) return
+    const id = setTimeout(() => setWait((w) => w - 1), 1000)
+    return () => clearTimeout(id)
+  }, [pending, wait])
 
   const run = async (body: object, onOk: (d: Res) => void) => {
     setBusy(true); setError('')
@@ -52,11 +61,13 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
             <Button type="submit" disabled={busy || !email} className="w-full">{busy ? t('st.sending') : t('em.sendOtp')}</Button>
           </form>
         ) : (
-          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'verify_otp', otp }, (d) => { setCurrent(d.email ?? ''); setPending(null); setOtp(''); setEmail(''); toast.success(d.message); window.dispatchEvent(new Event('dashboard:reload')); onDone?.() }) }}>
-            <p className="text-sm text-d-text2"><span className="font-mono">{pending}</span>{t('em.otpHint')}</p>
-            <OtpField value={otp} onChange={setOtp} />
-            <Button type="submit" disabled={busy || otp.length !== 8} className="w-full"><ShieldCheck className="mr-1 size-4" />{busy ? t('em.checking') : t('em.verify')}</Button>
-            <Button type="button" variant="ghost" size="xs" className="w-full text-d-text3" onClick={() => run({ action: 'cancel' }, () => { setPending(null); setOtp('') })}>{t('em.cancel')}</Button>
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'verify_otp', otp }, (d) => { setDone(true); toast.success(d.message); window.setTimeout(() => { setCurrent(d.email ?? ''); setPending(null); setOtp(''); setEmail(''); setDone(false); window.dispatchEvent(new Event('dashboard:reload')); onDone?.() }, 1500) }) }}>
+            <p className="text-sm text-d-text2"><span className="font-mono">{pending}</span><br /><span className="whitespace-nowrap">{t('em.otpHint').trim()}</span></p>
+            <OtpField value={otp} onChange={setOtp} disabled={busy || done} success={done} />
+            {done && <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400 animate-in fade-in zoom-in-95 duration-300"><CheckCircle2 className="size-5" />{t('em.done')}</div>}
+            <Button type="submit" disabled={busy || done || otp.length !== 8} className="w-full"><ShieldCheck className="mr-1 size-4" />{busy ? t('em.checking') : t('em.verify')}</Button>
+            <Button type="button" variant="outline" size="sm" className="w-full" disabled={busy || done || wait > 0} onClick={() => run({ action: 'request_change', new_email: pending }, () => { setWait(60); setOtp(''); toast.success(t('em.resent')) })}><RotateCw className="mr-1 size-3.5" />{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>
+            <Button type="button" variant="ghost" size="xs" className="w-full text-d-text3" disabled={done} onClick={() => run({ action: 'cancel' }, () => { setPending(null); setOtp('') })}>{t('em.cancel')}</Button>
           </form>
         )}
     </div>
