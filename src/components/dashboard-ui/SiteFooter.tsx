@@ -12,7 +12,7 @@ const SNS: { href: string; label: string; Icon: () => React.ReactElement }[] = [
   { href: 'https://x.com/ohatwikeeper', label: '@ohatwikeeper', Icon: XIcon },
   { href: 'https://x.com/Lapius7', label: '@Lapius7', Icon: XIcon },
   { href: 'https://discord.ohatwikeeper.com', label: 'Discord', Icon: DiscordIcon },
-  { href: 'https://github.com/Lapius7', label: 'GitHub', Icon: GitHubIcon },
+  { href: 'https://github.com/ohatwikeeper/ohatwikeeper', label: 'GitHub', Icon: GitHubIcon },
 ]
 
 const link = 'inline-flex items-center gap-1.5 whitespace-nowrap text-xs !text-d-text2 transition-colors hover:!text-d-accent'
@@ -24,7 +24,7 @@ declare const __BUILD_COMMIT__: string
 export default function SiteFooter() {
   const { t } = useTranslation()
   return (
-    <footer className="mt-auto space-y-3 border-t border-d-border/70 pt-5 pb-16 lg:pb-0">
+    <footer className="mt-auto space-y-3 border-t border-d-border/70 pt-5 pb-16">
       <Link to="/" className="block !text-d-text">
         <span className="whitespace-nowrap text-sm font-extrabold tracking-tight">おはツイKeeper</span>
       </Link>
