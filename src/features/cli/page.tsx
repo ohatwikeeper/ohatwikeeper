@@ -130,7 +130,7 @@ export default function CLIPage() {
               </p>
               <div className="pt-2">
                 <a
-                  href="https://github.com/Lapius7/ohatwikeeper-cli/releases"
+                  href="https://github.com/ohatwikeeper/ohatwikeeper-cli/releases"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-d-text !text-d-bg font-semibold text-xs hover:opacity-90 transition-opacity"
@@ -296,7 +296,7 @@ export default function CLIPage() {
               <i className="bx bxl-nodejs text-base" /> npm: @lapius/ohatwikeeper-cli
             </a>
             <a
-              href="https://github.com/Lapius7/ohatwikeeper-cli"
+              href="https://github.com/ohatwikeeper/ohatwikeeper-cli"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-d-card border border-d-border hover:border-d-text3 text-xs font-semibold text-d-text transition-colors"
