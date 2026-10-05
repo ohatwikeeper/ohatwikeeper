@@ -1,5 +1,6 @@
 import i18n from '@/i18n'
 import { useTranslation } from 'react-i18next'
+import { OtpCountdown } from '@/components/ui/otp-countdown'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from '@/lib/toast'
 import { CheckCircle2, MailPlus, RotateCw } from 'lucide-react'
@@ -81,6 +82,7 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
         ) : (
           <form ref={otpForm} className="space-y-3" onSubmit={(e) => { e.preventDefault(); if (busy || done || otp.length !== 8) return; run({ action: 'verify_otp', otp }, (d) => { setDone(true); toast.success(d.message); window.setTimeout(() => { setCurrent(d.email ?? ''); setAdding(false); setPending(null); setAdding(false); setOtp(''); setEmail(''); setDone(false); window.dispatchEvent(new Event('dashboard:reload')); onDone?.() }, 1500) }) }}>
             <p className="text-sm text-d-text2"><span className="font-mono">{pending}</span><br /><span className="whitespace-nowrap">{t('em.otpHint').trim()}</span></p>
+            {exp > 0 && <OtpCountdown expiresAt={exp} />}
             <OtpField value={otp} onChange={setOtp} disabled={busy || done} success={done} error={otpError} onComplete={() => otpForm.current?.requestSubmit()} />
             {done && <div className="flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400 animate-in fade-in zoom-in-95 duration-300"><CheckCircle2 className="size-5" />{t('em.done')}</div>}
             <Button type="button" variant="outline" size="sm" className="w-full" disabled={busy || done || wait > 0} onClick={() => run({ action: 'request_change', new_email: pending }, (d) => { setWait(d.resend_after ?? 60); setExp(Date.now() + 600000); setOtp(''); toast.success(t('em.resent')) })}><RotateCw className="mr-1 size-3.5" />{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>

@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { OtpCountdown } from '@/components/ui/otp-countdown'
 import { OtpField } from '@/components/ui/otp-field'
 
-interface Reg { provider: string; username: string; email: string | null; csrf: string; invitation_required: boolean; error: string | null; resend_after?: number }
+interface Reg { provider: string; username: string; email: string | null; csrf: string; invitation_required: boolean; error: string | null; resend_after?: number; expires_in?: number }
 
 const post = async (path: string, body: unknown) => {
   const r = await fetch('/app-api/auth/register/' + path, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -26,6 +27,7 @@ export default function ConfirmLoginPage() {
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [wait, setWait] = useState(0)
+  const [exp, setExp] = useState(0)
   useEffect(() => {
     if (step !== 'otp' || wait <= 0) return
     const id = setTimeout(() => setWait((w) => w - 1), 1000)
@@ -38,7 +40,7 @@ export default function ConfirmLoginPage() {
     fetch('/app-api/auth/register-state', { credentials: 'include' }).then(async (x) => {
       if (!x.ok) { window.location.href = '/login'; return }
       const d: Reg = await x.json()
-      setReg(d); setErr(d.error); setWait(d.resend_after ?? 0)
+      setReg(d); setErr(d.error); setWait(d.resend_after ?? 0); setExp(d.expires_in ? Date.now() + d.expires_in * 1000 : 0)
       if (d.email) { setEmail(d.email); setStep('otp') }
     })
   }, [])
@@ -58,7 +60,7 @@ export default function ConfirmLoginPage() {
         <p className="mt-3 text-sm text-d-text2">{t('lg.regDesc', { p: reg.provider === 'discord' ? 'Discord' : 'X', n: name })}</p>
         {err && <p className="mt-5 w-full rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">{err}</p>}
         {step === 'email' ? (
-          <form className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); void run(async () => { const d = await post('request_otp', { csrf: reg.csrf, email, invitation_code: code }); setWait(d.resend_after ?? 60); setStep('otp') }) }}>
+          <form className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); void run(async () => { const d = await post('request_otp', { csrf: reg.csrf, email, invitation_code: code }); setWait(d.resend_after ?? 60); setExp(Date.now() + 600000); setStep('otp') }) }}>
             <Input type="email" required placeholder={t('lg.email')} value={email} onChange={(e) => setEmail(e.target.value)} />
             {reg.invitation_required && <Input required placeholder={t('lg.invite')} value={code} onChange={(e) => setCode(e.target.value)} />}
             <Button type="submit" disabled={busy}>{t('lg.sendCode')}</Button>
@@ -66,8 +68,9 @@ export default function ConfirmLoginPage() {
         ) : (
           <form ref={otpForm} className="mt-8 flex w-full flex-col gap-3" onSubmit={(e) => { e.preventDefault(); if (busy || otp.length < 8) return; void run(async () => { const d = await post('verify', { csrf: reg.csrf, otp, r }); window.location.href = /^\/(?![\/\\])/.test(String(d.redirect)) ? d.redirect : '/dashboard' }, true) }}>
             <p className="text-sm text-d-text2">{t('lg.otpHint', { e: email })}</p>
+            {exp > Date.now() && <OtpCountdown expiresAt={exp} />}
             <OtpField value={otp} onChange={setOtp} disabled={busy} error={otpErr} onComplete={() => otpForm.current?.requestSubmit()} />
-            <Button type="button" variant="outline" disabled={busy || wait > 0} onClick={() => void run(async () => { const d = await post('request_otp', { csrf: reg.csrf, email, invitation_code: code }); setWait(d.resend_after ?? 60); setOtp('') })}>{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>
+            <Button type="button" variant="outline" disabled={busy || wait > 0} onClick={() => void run(async () => { const d = await post('request_otp', { csrf: reg.csrf, email, invitation_code: code }); setWait(d.resend_after ?? 60); setExp(Date.now() + 600000); setOtp('') })}>{wait > 0 ? t('em.resendIn', { s: wait }) : t('em.resend')}</Button>
             <Button type="button" variant="ghost" onClick={() => setStep('email')}>{t('lg.changeEmail')}</Button>
           </form>
         )}
