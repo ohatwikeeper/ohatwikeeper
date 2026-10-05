@@ -82,8 +82,8 @@ export default function LoginPage() {
                   <motion.span key={i} className="size-1.5 rounded-full bg-d-text2" animate={{ opacity: [0.25, 1, 0.25] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }} />
                 ))}
               </span>
-              <span className="flex size-6 items-center justify-center text-d-text">{busy === 'x' ? <XIcon /> : <span className="text-[#5865f2]"><DiscordIcon /></span>}</span>
-              <span>{t('lg.busy', { p: busy === 'x' ? 'X' : 'Discord' })}</span>
+              <span className="flex size-6 items-center justify-center text-d-text">{busy === 'x' ? <XIcon /> : busy === 'lapount' ? <span className="text-lg font-black text-d-accent">L</span> : <span className="text-[#5865f2]"><DiscordIcon /></span>}</span>
+              <span>{t('lg.busy', { p: busy === 'x' ? 'X' : busy === 'lapount' ? 'Lapount' : 'Discord' })}</span>
             </motion.div>
           )}
           <div className={`flex flex-col gap-3 transition-opacity ${busy ? 'pointer-events-none opacity-0' : ''}`}>
@@ -98,6 +98,9 @@ export default function LoginPage() {
                 </Button>
               </form>
             ))}
+            <Button type="button" disabled={busy !== null} onClick={() => { setBusy('lapount'); window.location.href = '/auth/lapount/start' + (r ? `?r=${encodeURIComponent(r)}` : '') }} className="h-14 w-full gap-3 rounded-full border border-d-border bg-d-bg text-[15px] font-bold text-d-text transition-transform hover:bg-d-border/40 active:scale-[0.97]">
+              <span className="text-lg font-black text-d-accent">L</span>Lapount でログイン
+            </Button>
           </div>
           </div>
 

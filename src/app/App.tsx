@@ -35,6 +35,7 @@ const ErrorPage = lazy(() => import('@/components/dashboard-ui/ErrorPage'))
 const OnboardPage = lazy(() => import('@/features/onboard/page'))
 import OnboardGate from '@/features/onboard/OnboardGate'
 const LoginPage = lazy(() => import('@/features/login/page'))
+const LapountCallbackPage = lazy(() => import('@/features/login/lapount-callback'))
 const ConfirmLoginPage = lazy(() => import('@/features/login/confirm'))
 const DevPage = lazy(() => import('@/features/dev/page'))
 const ApiDocsPage = lazy(() => import('@/features/dev/ApiDocsPage'))
@@ -95,6 +96,7 @@ function App() {
             <Route path="/onboard" element={<Suspense fallback={<PageLoader />}><OnboardPage /></Suspense>} />
             <Route path="/onboard/:step" element={<Suspense fallback={<PageLoader />}><OnboardPage /></Suspense>} />
             <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+            <Route path="/auth/lapount/callback" element={<Suspense fallback={<PageLoader />}><LapountCallbackPage /></Suspense>} />
             <Route path="/confirm_login" element={<Suspense fallback={<PageLoader />}><ConfirmLoginPage /></Suspense>} />
           <Route path="/" element={<TopPage />} />
           <Route element={<AppShell />}>
