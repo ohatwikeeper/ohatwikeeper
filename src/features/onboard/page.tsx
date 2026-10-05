@@ -178,7 +178,7 @@ export default function OnboardPage() {
         {step === 'done' && <>
           <Head t={tr('ob2.doneT')} d={tr('ob2.doneD')} />
           <div className="space-y-2">
-            <Button variant="secondary" className="w-full" onClick={() => { void finish('/extensions/oneclick_add') }}>{tr('ob2.ext')}</Button>
+            <Button variant="secondary" className="w-full" onClick={() => { void finish('/extension') }}>{tr('ob2.ext')}</Button>
             <Button className="w-full" onClick={() => { void finish(back ?? '/dashboard') }}>{tr('ob2.finish')}</Button>
           </div>
           <button type="button" onClick={() => go('notify')} className="cursor-pointer text-xs text-d-text3 hover:text-d-text">{tr('ob2.back')}</button>

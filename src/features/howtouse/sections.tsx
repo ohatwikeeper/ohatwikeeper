@@ -136,7 +136,7 @@ export const DOC_SECTIONS: DocSection[] = [
             ['比較', <C key="c">/diff</C>, '2人のユーザーを並べて比較。'],
             ['アワード一覧', <C key="d">/awards</C>, 'アワードの種類と条件。'],
             ['パッチノート', <C key="e">/patchnote</C>, '更新履歴。'],
-            ['拡張機能・CLI', <><C key="f">/extensions/oneclick_add</C><br /><C key="g">/cli</C></>, 'ブラウザ拡張機能とCLIの案内。'],
+            ['拡張機能・CLI', <><C key="f">/extension</C><br /><C key="g">/cli</C></>, 'ブラウザ拡張機能とCLIの案内。'],
           ]}
         />
         <H2>ユーザーごとの公開ページ</H2>

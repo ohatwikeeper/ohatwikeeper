@@ -27,7 +27,7 @@ export default function OnboardingChecklist({ data, csrf }: { data: NonNullable<
   }, [hidden])
   const steps = [
     { done: data.x, title: tr('ob.xT'), desc: tr('ob.xD'), to: `/login?action=login&provider=x&csrf=${encodeURIComponent(csrf)}`, ext: true, cta: tr('ob.xC') },
-    { done: data.extension, title: tr('ob.eT'), desc: tr('ob.eD'), to: '/extensions/oneclick_add', cta: tr('ob.eC') },
+    { done: data.extension, title: tr('ob.eT'), desc: tr('ob.eD'), to: '/extension', cta: tr('ob.eC') },
     { done: data.record, title: tr('ob.rT'), desc: tr('ob.rD'), to: '/tools', cta: tr('ob.rC') },
     { done: data.notify, title: tr('ob.nT'), desc: tr('ob.nD'), to: '/settings', cta: tr('ob.nC') },
   ]

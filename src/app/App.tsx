@@ -138,7 +138,7 @@ function App() {
           <Route path="/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
           <Route path="/policy" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
           <Route path="/policy.php" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
-          <Route path="/extensions/oneclick_add" element={<Suspense fallback={<PageLoader />}><ExtensionsPage /></Suspense>} />
+          <Route path="/extension" element={<Suspense fallback={<PageLoader />}><ExtensionsPage /></Suspense>} />
           <Route path="/ranking/today" element={<Navigate to="/ranking" replace />} />
           <Route path="/ranking_today.php" element={<Navigate to="/ranking" replace />} />
           <Route path="/ranking" element={<Suspense fallback={<PageLoader />}><RankingPage /></Suspense>} />

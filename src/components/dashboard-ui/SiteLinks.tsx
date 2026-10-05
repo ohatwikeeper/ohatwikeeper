@@ -12,7 +12,7 @@ export const PUBLIC_LINKS: { to: string; label: string; icon: string }[] = [
 export const GUIDE_LINKS: { to: string; label: string; icon: string; external?: boolean }[] = [
   { to: '/howtouse', label: 'nav.howtouse', icon: 'bx-book-open' },
   { to: '/cli', label: 'nav.cli', icon: 'bx-terminal' },
-  { to: '/extensions/oneclick_add', label: 'nav.extension', icon: 'bx-extension' },
+  { to: '/extension', label: 'nav.extension', icon: 'bx-extension' },
   { to: '/tools', label: 'nav.tools', icon: 'bx-wrench' },
  { to: '/patchnote', label: 'nav.patchnote', icon: 'bx-news' },
  { to: '/dev/api-docs', label: 'nav.apidocs', icon: 'bx-code-curly' },

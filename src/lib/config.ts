@@ -17,7 +17,7 @@ export const CONFIG = {
     PROFILE: (uuid: string) => `/${uuid}`,
     SETTINGS: '/settings',
     SETTINGS_API: '/settings_api',
-    EXTENSIONS: '/extensions/oneclick_add',
+    EXTENSIONS: '/extension',
     PATCHNOTES: '/patchnote',
     HOW_TO_USE: '/howtouse',
     RANKING: '/ranking',

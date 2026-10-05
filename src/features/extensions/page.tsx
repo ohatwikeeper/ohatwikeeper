@@ -19,20 +19,12 @@ export default function ExtensionsPage() {
           <PageHeader icon={Puzzle} title={tr('ex.title')} desc={tr('ex.desc')} />
           <div className="mt-6 flex flex-wrap gap-4 justify-center sm:justify-start">
             <a
-              href="https://chromewebstore.google.com/detail/ohatwikeeper/..."
+              href="https://chromewebstore.google.com/detail/aflgkhadffoploabchfeaakdkaggchig"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-d-text !text-d-bg font-bold text-sm hover:opacity-90 transition-opacity"
             >
               <i className="bx bxl-chrome text-lg" /> {tr('ex.chrome')}
-            </a>
-            <a
-              href="https://addons.mozilla.org/ja/firefox/addon/ohatwikeeper/..."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-d-card border border-d-border hover:border-d-text3 text-d-text font-bold text-sm transition-colors"
-            >
-              <i className="bx bxl-firefox text-lg" /> {tr('ex.firefox')}
             </a>
           </div>
         </div>
