@@ -459,7 +459,7 @@ https://x.com/user/status/1111111111111111111`}</Code>
         <H2>CLI「ohax」</H2>
         <P>ターミナルで、プロフィール、グラフ、草カレンダー、アワードを表示できます。インストール方法は3つあります。</P>
         <H3>npm</H3>
-        <Code>{`npm i -g @lapius/ohatwikeeper-cli`}</Code>
+        <Code>{`npm i -g @ohatwikeeper/cli`}</Code>
         <H3>Go</H3>
         <Code>{`go install github.com/lapius7/ohatwikeeper-cli/cmd/ohax@latest`}</Code>
         <H3>シェルスクリプト（Linux / Mac）</H3>
@@ -584,7 +584,7 @@ OHATWIKEEPER-API-KEY: YOUR_API_KEY_HERE`}</Code>
         </P>
         <H3>数値が更新されません。</H3>
         <P>
-          当日のポストは10分ごと、1か月以内のポストは毎日更新されます。すぐに反映したいときは、ダッシュボードの「過去1か月分を更新」を押してください。1か月より古いポストは「すべて更新」で更新されます。
+          当日のポストは10分ごと、1週間以内のポストは毎日更新されます。すぐに反映したいときは、ダッシュボードの「過去1か月分を更新」を押してください。1か月より古いポストは「すべて更新」で更新されます。
         </P>
         <H3>登録したのに一覧に出ません。</H3>
         <P>

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import { CONFIG } from '@/lib/config'
 import { Accordion } from '@/components/arc/accordion/accordion'
 
-const INSTALL = "npm i -g @lapius/ohatwikeeper-cli"
+const INSTALL = "npm i -g @ohatwikeeper/cli"
 
 export function CmdLine({ cmd, id, prompt = "$" }: { cmd: string; id?: string; prompt?: React.ReactNode }) {
   const { t } = useTranslation()

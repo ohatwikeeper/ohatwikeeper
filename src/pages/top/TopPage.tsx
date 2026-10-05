@@ -17,7 +17,7 @@ interface RankItem { public_uuid: string; x_icon: string | null; author: string 
 
 const ACCENT = 'var(--d-accent)'
 const EASE = [0.22, 1, 0.36, 1] as const
-const CLI_INSTALL = "npm i -g @lapius/ohatwikeeper-cli"
+const CLI_INSTALL = "npm i -g @ohatwikeeper/cli"
 const MARQUEE = ['tp.mqSave', 'tp.mqTimeline', 'tp.mqGrass', 'tp.mqAwards', 'tp.mqOgp', 'tp.mqBulk', 'tp.mqStreak', 'tp.mqRanking', 'tp.mqCli', 'tp.mqExt']
 const FAQ = [['tp.faqQ1', 'tp.faqA1'], ['tp.faqQ2', 'tp.faqA2'], ['tp.faqQ3', 'tp.faqA3']]
 const STEPS = [['tp.stepT1', 'tp.stepD1'], ['tp.stepT2', 'tp.stepD2'], ['tp.stepT3', 'tp.stepD3']]

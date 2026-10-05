@@ -23,8 +23,8 @@ export default function CLIPage() {
     })
   }
 
-  const installNpm = `npm i -g @lapius/ohatwikeeper-cli`
-  const runNpx = `npx @lapius/ohatwikeeper-cli <user>`
+  const installNpm = `npm i -g @ohatwikeeper/cli`
+  const runNpx = `npx @ohatwikeeper/cli <user>`
   const installSh = `curl -fsSL ${CONFIG.APP_BASE}/cli/install.sh | bash`
   const installGo = `go install github.com/lapius7/ohatwikeeper-cli/cmd/ohax@latest`
 
@@ -288,12 +288,12 @@ export default function CLIPage() {
           </div>
           <div className="flex gap-3 flex-wrap">
             <a
-              href="https://www.npmjs.com/package/@lapius/ohatwikeeper-cli"
+              href="https://www.npmjs.com/package/@ohatwikeeper/cli"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CB3837]/10 border border-[#CB3837]/20 text-xs font-semibold text-[#CB3837] transition-colors"
             >
-              <i className="bx bxl-nodejs text-base" /> npm: @lapius/ohatwikeeper-cli
+              <i className="bx bxl-nodejs text-base" /> npm: @ohatwikeeper/cli
             </a>
             <a
               href="https://github.com/ohatwikeeper/ohatwikeeper-cli"
