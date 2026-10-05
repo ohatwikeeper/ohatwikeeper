@@ -15,6 +15,7 @@ import TopPage from '@/pages/top/TopPage'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
 
 const GraphPage = lazy(() => import('@/pages/public/GraphPage'))
+const ApiDocsPage = lazy(() => import('@/features/dev/ApiDocsPage'))
 const AwardsPage = lazy(() => import('@/pages/public/AwardsPage'))
 const SearchPage = lazy(() => import('@/pages/search/SearchPage'))
 const GalleryPage = lazy(() => import('@/pages/public/GalleryPage'))
@@ -38,7 +39,6 @@ const LoginPage = lazy(() => import('@/features/login/page'))
 const LapountCallbackPage = lazy(() => import('@/features/login/lapount-callback'))
 const ConfirmLoginPage = lazy(() => import('@/features/login/confirm'))
 const DevPage = lazy(() => import('@/features/dev/page'))
-const ApiDocsPage = lazy(() => import('@/features/dev/ApiDocsPage'))
 const TerminalPage = lazy(() => import('@/features/dev/TerminalPage'))
 const PolicyPage = lazy(() => import('@/features/policy/page'))
 const TermsPage = lazy(() => import('@/features/terms/page'))
@@ -128,7 +128,8 @@ function App() {
           <Route path="/u/:handle" element={<Suspense fallback={<PageLoader />}><HandleSearchPage /></Suspense>} />
           <Route path="/search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
           <Route path="/dev" element={<Suspense fallback={<PageLoader />}><DevPage /></Suspense>} />
-          <Route path="/dev/api-docs" element={<Suspense fallback={<PageLoader />}><ApiDocsPage /></Suspense>} />
+          <Route path="/dev/api-docs" element={<Navigate to="/api-docs" replace />} />
+          <Route path="/api-docs" element={<Suspense fallback={<PageLoader />}><ApiDocsPage /></Suspense>} />
           <Route path="/terminal" element={<Suspense fallback={<PageLoader />}><TerminalPage /></Suspense>} />
           <Route path="/howtouse" element={<Suspense fallback={<PageLoader />}><HowToUsePage /></Suspense>} />
           <Route path="/howtouse/:section" element={<Suspense fallback={<PageLoader />}><HowToUsePage /></Suspense>} />

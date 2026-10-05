@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Palette } from 'lucide-react'
+import { Languages, Palette, Sun } from 'lucide-react'
+import IconStack from '@/components/dashboard-ui/IconStack'
 import AuthButton from '@/components/dashboard-ui/AuthButton'
 import MobileMenu from '@/components/dashboard-ui/MobileMenu'
 import SiteLinks from '@/components/dashboard-ui/SiteLinks'
@@ -53,7 +54,8 @@ export function PublicProfileCard({ profile, publicUuid }: {
       )}
       <div className="flex items-start justify-between">
         <img className={`size-20 rounded-full border-4 border-background bg-d-light ${profile.banner_url ? "-mt-10" : ""}`} src={profile.avatar_url} alt="" />
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
+          <IconStack chips={[Sun, Palette, Languages]} total={4}>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <Tip label={t('nb.themeSettings')}>
             <button
@@ -67,6 +69,7 @@ export function PublicProfileCard({ profile, publicUuid }: {
             </button>
           </Tip>
           <AuthButton />
+          </IconStack>
         </div>
       </div>
 

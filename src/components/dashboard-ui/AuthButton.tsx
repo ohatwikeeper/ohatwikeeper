@@ -1,4 +1,4 @@
-import { LogIn, LogOut } from 'lucide-react'
+import { KeyRound, LogOut } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { useDashboard } from '@/lib/dashboard/hooks'
@@ -25,7 +25,7 @@ function Auth() {
     return <Tip label={label}><button type="button" onClick={askLogout} aria-label={label} data-cuelume-skip className={`${cls} hover:!text-red-400`}><LogOut className="size-[18px]" /></button></Tip>
   }
   const label = t('guest.login')
-  return <Tip label={label}><a href={loginHref(pathname + search)} aria-label={label} className={cls}><LogIn className="size-[18px]" /></a></Tip>
+  return <Tip label={label}><a href={loginHref(pathname + search)} aria-label={label} className={cls}><KeyRound className="size-[18px]" /></a></Tip>
 }
 
 /** 言語切替 + ログイン/ログアウト。言語ボタンは常にログアウト(ログイン)の左 */

@@ -15,7 +15,7 @@ export const GUIDE_LINKS: { to: string; label: string; icon: string; external?: 
   { to: '/extension', label: 'nav.extension', icon: 'bx-extension' },
   { to: '/tools', label: 'nav.tools', icon: 'bx-wrench' },
  { to: '/patchnote', label: 'nav.patchnote', icon: 'bx-news' },
- { to: '/dev/api-docs', label: 'nav.apidocs', icon: 'bx-code-curly' },
+ { to: '/api-docs', label: 'nav.apidocs', icon: 'bx-code-curly' },
  { to: '/terminal', label: 'nav.terminal', icon: 'bx-terminal' },
  { to: '/dev', label: 'nav.dev', icon: 'bx-code-alt' },
  { to: '/terms', label: 'nav.terms', icon: 'bx-file' },

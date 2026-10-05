@@ -1,4 +1,5 @@
-import { LogIn, Palette } from 'lucide-react'
+import { Languages, LogIn, Palette, Sun } from 'lucide-react'
+import IconStack from '@/components/dashboard-ui/IconStack'
 import { useTranslation } from 'react-i18next'
 import { useDashTheme } from '@/lib/dashboard/theme'
 import ThemeToggle from '@/features/profile/ThemeToggle'
@@ -18,7 +19,8 @@ export default function GuestToolbar({ loginHref }: { loginHref: string }) {
       <OwnerBadge own={false} guest />
       <div className="flex items-start justify-between">
         <Skeleton shimmer={false} className="size-20 rounded-full bg-d-light" />
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
+          <IconStack chips={[Sun, Palette, Languages]} total={4}>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <Tip label={t('cm.theme')}>
             <button type="button" onClick={() => nav('/settings/theme')} aria-label={t('cm.themeOpen')} data-cuelume-skip
@@ -27,6 +29,7 @@ export default function GuestToolbar({ loginHref }: { loginHref: string }) {
             </button>
           </Tip>
           <AuthButton />
+          </IconStack>
         </div>
       </div>
       <Skeleton shimmer={false} className="mt-4 h-7 w-40 bg-d-light" />

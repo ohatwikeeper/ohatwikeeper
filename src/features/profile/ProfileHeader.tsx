@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Compass, LogOut, Palette } from 'lucide-react'
+import { Compass, LogOut, Palette, Sun } from 'lucide-react'
 import { askLogout } from '@/widgets/LogoutDialog'
 import type { Profile } from '@/lib/dashboard/types'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +12,10 @@ import BioText from '@/features/profile/BioText'
 import { Link } from 'react-router-dom'
 import NotificationBell from '@/features/profile/NotificationBell'
 import Tip from '@/components/dashboard-ui/Tip'
+
+// アイコン列: 普段は小さく重ねて表示し、ホバー/フォーカスで左へ展開(タッチ端末は常時展開)
+import IconStack from '@/components/dashboard-ui/IconStack'
+const Slot = ({ children }: { children: React.ReactNode }) => <span className="flex shrink-0">{children}</span>
 
 export default function ProfileHeader({ profile, onTour, theme, onToggleTheme }: {
   profile: Profile
@@ -36,9 +40,10 @@ export default function ProfileHeader({ profile, onTour, theme, onToggleTheme }:
       )}
       <div className="flex items-start justify-between">
         <img className={`size-20 rounded-full bg-d-light ${profile.banner_url ? 'border-4 border-background -mt-10' : ''}`} src={profile.avatar_url} alt="" />
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
+          <IconStack chips={[Compass, Sun, Palette]} total={6}>
           {onTour && (
-          <Tip label={t('nb.tour')}>
+          <Slot><Tip label={t('nb.tour')}>
             <button
               type="button"
               onClick={onTour}
@@ -48,10 +53,10 @@ export default function ProfileHeader({ profile, onTour, theme, onToggleTheme }:
             >
               <Compass className="size-[18px]" />
             </button>
-          </Tip>
+          </Tip></Slot>
           )}
-          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-          <Tip label={t('nb.themeSettings')}>
+          <Slot><ThemeToggle theme={theme} onToggle={onToggleTheme} /></Slot>
+          <Slot><Tip label={t('nb.themeSettings')}>
             <button
               type="button"
               onClick={() => nav('/settings/theme')}
@@ -61,10 +66,10 @@ export default function ProfileHeader({ profile, onTour, theme, onToggleTheme }:
             >
               <Palette className="size-[18px]" />
             </button>
-          </Tip>
-          <LanguageSwitcher compact />
-          <NotificationBell />
-          <Tip label={t('nb.logout')}>
+          </Tip></Slot>
+          <Slot><LanguageSwitcher compact /></Slot>
+          <Slot><NotificationBell /></Slot>
+          <Slot><Tip label={t('nb.logout')}>
             <button
               type="button"
               onClick={askLogout}
@@ -74,7 +79,8 @@ export default function ProfileHeader({ profile, onTour, theme, onToggleTheme }:
             >
               <LogOut className="size-[18px]" />
             </button>
-          </Tip>
+          </Tip></Slot>
+          </IconStack>
         </div>
       </div>
       <h1 className="mt-4 font-[family-name:var(--d-serif)] text-2xl font-semibold tracking-tight leading-tight">

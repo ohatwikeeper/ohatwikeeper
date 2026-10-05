@@ -1,4 +1,5 @@
 import i18n from '@/i18n'
+import { DisconnectButton } from '@/components/ui/disconnect-button'
 import { Switch } from '@/components/ui/switch'
 import { confirmDialog } from '@/lib/confirm'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -71,6 +72,7 @@ interface SettingsData {
     is_public: boolean
     api_key: string | null
     lapount_linked?: boolean
+    lapount_handle?: string | null
     discord_id: string | null
     discord_username: string | null
     x_id: string | null
@@ -139,6 +141,11 @@ export default function SettingsPage() {
   useEffect(() => {
     document.title = `${t('st.docTitle')} - おはツイKeeper`
     loadData()
+  }, [loadData])
+  useEffect(() => {
+    const h = () => { void loadData() }
+    window.addEventListener('dashboard:reload', h)
+    return () => window.removeEventListener('dashboard:reload', h)
   }, [loadData])
 
 
@@ -334,16 +341,7 @@ function AccountTab({
             </div>
 
             {u.x_id ? (
-              <Button variant="destructive" size="sm"
-                onClick={async () => {
-                  if (await confirmDialog(t('st.unlinkX?'))) {
-                    runAction(() => apiCall('/unlink', 'POST', { provider: 'x' }), t('st.unlinkedX'))
-                  }
-                }}
-                className="border-red-500/30"
-              >
-                {t('st.unlink')}
-              </Button>
+              <DisconnectButton onConfirm={() => runAction(() => apiCall('/unlink', 'POST', { provider: 'x' }), t('st.unlinkedX'))} />
             ) : (
               <a
                 href={CONFIG.EXTERNAL.X_LOGIN('settings')}
@@ -360,15 +358,11 @@ function AccountTab({
               <div className="w-10 h-10 rounded-xl bg-d-accent/15 border border-d-accent/40 flex items-center justify-center text-sm font-black text-d-accent">L</div>
               <div>
                 <div className="font-semibold text-sm text-d-text">Lapount</div>
-                <div className="text-xs text-d-text3">{u.lapount_linked ? <span className="text-d-text2">{t('st.linked')}</span> : t('st.unlinked')}</div>
+                <div className="text-xs text-d-text3">{u.lapount_linked ? <span className="text-d-text2">{u.lapount_handle ? `@${u.lapount_handle}` : t('st.linked')}</span> : t('st.unlinked')}</div>
               </div>
             </div>
             {u.lapount_linked ? (
-              <Button variant="destructive" size="sm" className="border-red-500/30"
-                onClick={async () => {
-                  if (await confirmDialog('Lapountの連携を解除しますか?')) runAction(() => apiCall('/unlink', 'POST', { provider: 'lapount' }), 'Lapountの連携を解除しました')
-                }}
-              >{t('st.unlink')}</Button>
+              <DisconnectButton onConfirm={() => runAction(() => apiCall('/unlink', 'POST', { provider: 'lapount' }), 'Lapountの連携を解除しました')} />
             ) : (
               <a href="/auth/lapount/start?r=/settings" className="px-3 py-1.5 rounded-lg bg-d-bg border border-d-border text-d-text text-xs font-semibold">{t('st.link')}</a>
             )}
@@ -393,16 +387,7 @@ function AccountTab({
             </div>
 
             {u.discord_id ? (
-              <Button variant="destructive" size="sm"
-                onClick={async () => {
-                  if (await confirmDialog(t('st.unlinkD?'))) {
-                    runAction(() => apiCall('/unlink', 'POST', { provider: 'discord' }), t('st.unlinkedD'))
-                  }
-                }}
-                className="border-red-500/30"
-              >
-                {t('st.unlink')}
-              </Button>
+              <DisconnectButton onConfirm={() => runAction(() => apiCall('/unlink', 'POST', { provider: 'discord' }), t('st.unlinkedD'))} />
             ) : (
               <a
                 href="/login?provider=discord&r=settings"

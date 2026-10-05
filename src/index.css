@@ -2107,3 +2107,15 @@ html:has(.dash-scope) { scrollbar-color: var(--d-border) var(--d-bg); }
 @media (prefers-reduced-motion: reduce) {
   .otp-trail, .otp-trail-success, .otp-bounce, .otp-processing { animation: none; }
 }
+
+@keyframes otp-glow { 0% { box-shadow: 0 0 0 0 rgba(248,113,113,0); background-color: transparent } 40% { box-shadow: 0 0 0 1.5px rgba(248,113,113,.95), 0 0 16px 2px rgba(239,68,68,.55) } 100% { box-shadow: 0 0 0 1.5px rgba(248,113,113,.7), 0 0 8px 0 rgba(239,68,68,.25) } }
+.otp-err [data-slot="input-otp-slot"] { animation: otp-glow .3s ease-out both; }
+.otp-err [data-slot="input-otp-slot"][data-index="0"] { animation-delay: 0ms }
+.otp-err [data-slot="input-otp-slot"][data-index="1"] { animation-delay: 28ms }
+.otp-err [data-slot="input-otp-slot"][data-index="2"] { animation-delay: 56ms }
+.otp-err [data-slot="input-otp-slot"][data-index="3"] { animation-delay: 84ms }
+.otp-err [data-slot="input-otp-slot"][data-index="4"] { animation-delay: 112ms }
+.otp-err [data-slot="input-otp-slot"][data-index="5"] { animation-delay: 140ms }
+.otp-err [data-slot="input-otp-slot"][data-index="6"] { animation-delay: 168ms }
+.otp-err [data-slot="input-otp-slot"][data-index="7"] { animation-delay: 196ms }
+@media (prefers-reduced-motion: reduce) { .otp-err [data-slot="input-otp-slot"] { animation: none; box-shadow: 0 0 0 1.5px rgba(248,113,113,.7) } }
