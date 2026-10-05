@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,7 +9,8 @@ import path from 'path'
 const ymd = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Tokyo' }).replace(/-/g, '')
 const rand = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('')
 
-const hash = (() => { try { return execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return 'nogit00' } })()
+// 末尾7桁は公開リポジトリ(ohatwikeeper/ohatwikeeper)のコミットIDに揃える。top/.public-commit があればそれを優先(公開側には無いので自身のHEAD)
+const hash = (() => { try { const v = readFileSync(new URL('.public-commit', import.meta.url), 'utf8').trim(); if (/^[0-9a-f]{7}$/.test(v)) return v } catch {} try { return execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return 'nogit00' } })()
 
 export default defineConfig({
   define: { __BUILD_VERSION__: JSON.stringify(`${ymd}-${rand}${hash}`) },
