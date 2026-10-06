@@ -8,6 +8,7 @@ import { GlimmProvider } from 'glimm/react'
 // import { bindGlobalClickSounds } from '@/lib/cuelume-sound'
 import ActionWidget from '@/widgets/ActionWidget'
 import CommandPalette from '@/widgets/CommandPalette'
+import SiteContextMenu from '@/widgets/SiteContextMenu'
 import SplashCursor from '@/widgets/SplashCursor'
 import DonationBar from '@/components/dashboard-ui/DonationBar'
 import MaintenanceGate from '@/features/maintenance/MaintenanceGate'
@@ -88,6 +89,7 @@ function App() {
   return (
     <BrowserRouter>
       <GlimmProvider palette="azure" brightness={0.85}>
+        <SiteContextMenu>
         {!splashCursorDisabled && <SplashCursor />}
         <MaintenanceGate>
         <DonationBar />
@@ -184,6 +186,7 @@ function App() {
         <NotAdmin><ActionWidget /></NotAdmin>
         <CommandPalette />
         <OnboardGate />
+        </SiteContextMenu>
       </GlimmProvider>
     </BrowserRouter>
   )

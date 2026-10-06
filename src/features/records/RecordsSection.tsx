@@ -14,6 +14,7 @@ import { HoldToDeleteButton } from '@/components/ui/hold-to-delete-button'
 import { AnimatePresence, motion } from 'motion/react'
 import { dbtn } from '@/components/dashboard-ui/DButton'
 import ViewToggle from '@/features/records/ViewToggle'
+import { ConfirmDialog } from '@/components/ui/alert-dialog'
 import Tip from '@/components/dashboard-ui/Tip'
 
 /** 一度に描画する件数。スクロールでこの単位ずつ増やし、全件同時描画による重さを防ぐ */
@@ -169,6 +170,19 @@ function thumb(url: string | null, name: 'thumb' | 'small') {
 export default function RecordsSection(props: Props) {
   const { t } = useTranslation()
   const wdays = t('rc.wdays').split(',')
+  const [delId, setDelId] = useState<string | null>(null)
+  const tweetRef = useRef(props.onTweet)
+  tweetRef.current = props.onTweet
+  const canDelete = !!props.onDelete
+  useEffect(() => {
+    const h = (e: Event) => {
+      const d = (e as CustomEvent<{ action: string; id: string }>).detail
+      if (d.action === 'tweet') tweetRef.current(d.id)
+      else if (d.action === 'delete' && canDelete) setDelId(d.id)
+    }
+    document.addEventListener('ctx-record', h)
+    return () => document.removeEventListener('ctx-record', h)
+  }, [canDelete])
   const { records, lastUpdateTime, scheduledUpdateTime, onImage, onTweet, onDelete } = props
   const [view, setView] = useState(readView)
   const [sort, setSort] = useState<{ key: SortKey; order: 'asc' | 'desc' }>({ key: 'date', order: 'desc' })
@@ -249,6 +263,7 @@ export default function RecordsSection(props: Props) {
 
   return (
     <>
+      <ConfirmDialog open={delId !== null} onOpenChange={(o) => !o && setDelId(null)} title={t('rc.delete')} onConfirm={() => { if (delId) props.onDelete?.(delId) }} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <div className="flex flex-wrap items-center gap-3">
           {!props.hideFilters && (<>
@@ -346,7 +361,7 @@ export default function RecordsSection(props: Props) {
                   <TableRow><TableCell colSpan={8}><AppEmpty title={records.length ? t('rc.emptyFilter') : t('rc.emptyNone')} description={records.length ? t('rc.emptyFilterD') : undefined} /></TableCell></TableRow>
                 )}
                 {shown.map((r) => (
-                  <TableRow key={r.uniqid} className="cursor-pointer" onClick={() => onTweet(r.uniqid)}>
+                  <TableRow key={r.uniqid} data-ctx-record={r.uniqid} data-ctx-url={r.url} data-ctx-detail={r.detail_id} className="cursor-pointer" onClick={() => onTweet(r.uniqid)}>
                     <TableCell className="px-2 py-3 "><Thumb r={r} onImage={onImage} size="cell" /></TableCell>
                     <TableCell className="px-2 py-3 ">
                       {shortDate(r.date)}{r.metrics_error && <ErrBadge />}
@@ -370,6 +385,7 @@ export default function RecordsSection(props: Props) {
             {shown.map((r) => (
               <div
                 key={r.uniqid}
+                data-ctx-record={r.uniqid} data-ctx-url={r.url} data-ctx-detail={r.detail_id}
                 onClick={() => onTweet(r.uniqid)}
                 className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-d-border hover:border-d-text3"
               >
