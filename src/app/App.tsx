@@ -44,6 +44,7 @@ const TerminalPage = lazy(() => import('@/features/dev/TerminalPage'))
 const PolicyPage = lazy(() => import('@/features/policy/page'))
 const TermsPage = lazy(() => import('@/features/terms/page'))
 const ExtensionsPage = lazy(() => import('@/features/extensions/page'))
+const BetaPage = lazy(() => import('@/features/beta/page'))
 const PatchnotesPage = lazy(() => import('@/features/patchnotes/page'))
 const HowToUsePage = lazy(() => import('@/features/howtouse/page'))
 const RankingPage = lazy(() => import('@/features/ranking/page'))
@@ -100,6 +101,8 @@ function App() {
             <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
             <Route path="/auth/lapount/callback" element={<Suspense fallback={<PageLoader />}><LapountCallbackPage /></Suspense>} />
             <Route path="/confirm_login" element={<Suspense fallback={<PageLoader />}><ConfirmLoginPage /></Suspense>} />
+            <Route path="/beta" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
+            <Route path="/beta/diff" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
           <Route path="/" element={<TopPage />} />
           <Route element={<AppShell />}>
           <Route element={<DashboardPage />}>
