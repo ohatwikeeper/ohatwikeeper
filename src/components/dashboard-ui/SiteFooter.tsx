@@ -2,7 +2,6 @@ import type React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { IS_BETA } from '@/lib/beta/env'
 
 const LEGAL: [string, string][] = [['/patchnote', 'footer.updates'], ['/policy', 'footer.policy'], ['/terms', 'footer.terms'], ['/dev', 'footer.dev']]
 
@@ -51,7 +50,8 @@ export default function SiteFooter() {
         ))}
       </div>
       <div className="text-[11px] text-d-text3">© {new Date().getFullYear()} おはツイKeeper by 狐ノ瀬つづり</div>
-      {IS_BETA && <BetaDiff />}
+      {/* 個別指示により beta 環境だけ表示 */}
+      {typeof location !== 'undefined' && (location.hostname.startsWith('beta.') || location.hostname === 'localhost') && <BetaDiff />}
       <div className="select-text font-mono text-[10px] text-d-text3" title={t('footer.build')}><a href={`https://github.com/ohatwikeeper/${__BUILD_REPO__}/commit/${__BUILD_COMMIT__}`} target="_blank" rel="noopener noreferrer" className="hover:text-d-text2 hover:underline">{__BUILD_VERSION__}</a></div>
     </footer>
   )
