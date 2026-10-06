@@ -37,8 +37,7 @@ import {
   Tag,
   ArrowUpDown,
   X,
-  ChevronLeft,
-  ChevronRight, TrendingUp } from 'lucide-react'
+  TrendingUp } from 'lucide-react'
 
 interface ShortLink {
   id: number
@@ -512,24 +511,9 @@ export default function RLinksPage() {
 
         {/* Pagination */}
         {data && data.pages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
-            <Button variant="outline"
-              disabled={currentPage <= 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="border-d-border"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <span className="text-xs text-d-text2 px-3 py-1 font-mono">
-              {t('rl.pageInfo', { p: currentPage, n: data.pages, t: data.total })}
-            </span>
-            <Button variant="outline"
-              disabled={currentPage >= data.pages}
-              onClick={() => setCurrentPage((p) => Math.min(data.pages, p + 1))}
-              className="border-d-border"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-2 text-sm text-d-text2">
+            <span className="tabular-nums">{t('rl.pageInfo', { p: currentPage, n: data.pages, t: data.total })}</span>
+            <Pagination page={currentPage} pageCount={data.pages} onPageChange={setCurrentPage} label={t('rl.pagLabel')} />
           </div>
         )}
 

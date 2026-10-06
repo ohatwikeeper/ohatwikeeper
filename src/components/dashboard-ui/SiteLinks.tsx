@@ -7,6 +7,7 @@ export const PUBLIC_LINKS: { to: string; label: string; icon: string }[] = [
   { to: '/search', label: 'nav.search', icon: 'bx-search' },
   { to: '/diff', label: 'nav.diff', icon: 'bx-git-compare' },
   { to: '/survey', label: 'nav.survey', icon: 'bx-poll' },
+  { to: '/timeline', label: 'nav.timeline', icon: 'bx-history' },
 ]
 // 使い方・連携ツール
 export const GUIDE_LINKS: { to: string; label: string; icon: string; external?: boolean }[] = [

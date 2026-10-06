@@ -46,6 +46,7 @@ const TerminalPage = lazy(() => import('@/features/dev/TerminalPage'))
 const PolicyPage = lazy(() => import('@/features/policy/page'))
 const TermsPage = lazy(() => import('@/features/terms/page'))
 const ExtensionsPage = lazy(() => import('@/features/extensions/page'))
+const TimelinePage = lazy(() => import('@/features/timeline/page'))
 const BetaPage = lazy(() => import('@/features/beta/page'))
 const PatchnotesPage = lazy(() => import('@/features/patchnotes/page'))
 const HowToUsePage = lazy(() => import('@/features/howtouse/page'))
@@ -145,6 +146,7 @@ function App() {
           <Route path="/patchnote.php" element={<Suspense fallback={<PageLoader />}><PatchnotesPage /></Suspense>} />
           <Route path="/beta" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
           <Route path="/beta/diff" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
+          <Route path="/timeline" element={<Suspense fallback={<PageLoader />}><TimelinePage /></Suspense>} />
           <Route path="/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
           <Route path="/policy" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
           <Route path="/policy.php" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
