@@ -1,6 +1,8 @@
 import type React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { IS_BETA } from '@/lib/beta/env'
 
 const LEGAL: [string, string][] = [['/patchnote', 'footer.updates'], ['/policy', 'footer.policy'], ['/terms', 'footer.terms'], ['/dev', 'footer.dev']]
 
@@ -16,6 +18,16 @@ const SNS: { href: string; label: string; Icon: () => React.ReactElement }[] = [
 ]
 
 const link = 'inline-flex items-center gap-1.5 whitespace-nowrap text-xs !text-d-text2 transition-colors hover:!text-d-accent'
+
+/** beta 限定: 本番との差(コミット数・変更ファイル数) */
+function BetaDiff() {
+  const [d, setD] = useState<{ c: number; f: number } | null>(null)
+  useEffect(() => {
+    fetch('/app-api/beta-info').then((r) => r.json()).then((j) => setD({ c: j.commits?.length ?? 0, f: j.files?.length ?? 0 })).catch(() => {})
+  }, [])
+  if (!d) return null
+  return <div className="text-[10px] text-d-text3"><Link to="/beta/diff" className="hover:text-d-text2 hover:underline">本番との差: {d.c}コミット / {d.f}ファイル</Link></div>
+}
 
 /** サイドバー下部のフッター(カードなし) */
 declare const __BUILD_VERSION__: string
@@ -39,6 +51,7 @@ export default function SiteFooter() {
         ))}
       </div>
       <div className="text-[11px] text-d-text3">© {new Date().getFullYear()} おはツイKeeper by 狐ノ瀬つづり</div>
+      {IS_BETA && <BetaDiff />}
       <div className="select-text font-mono text-[10px] text-d-text3" title={t('footer.build')}><a href={`https://github.com/ohatwikeeper/${__BUILD_REPO__}/commit/${__BUILD_COMMIT__}`} target="_blank" rel="noopener noreferrer" className="hover:text-d-text2 hover:underline">{__BUILD_VERSION__}</a></div>
     </footer>
   )

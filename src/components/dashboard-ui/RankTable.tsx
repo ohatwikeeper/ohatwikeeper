@@ -56,7 +56,7 @@ export default function RankTable({ rows, cols, defaultSort }: { rows: RankRow[]
                 <span className={`inline-flex size-7 items-center justify-center rounded-full text-xs font-bold ${i < 3 ? 'bg-d-text text-d-bg' : 'bg-d-med text-d-text2'}`}>{i + 1}</span>
               </TableCell>
               <TableCell>
-                <Link to={r.href} className="flex items-center gap-3">
+                <Link to={r.href} data-user-card={/^\/[A-Za-z0-9]+$/.test(r.href) ? r.href.slice(1) : undefined} className="flex items-center gap-3">
                   {r.avatar
                     ? <img src={r.avatar} alt="" loading="lazy" className="size-8 shrink-0 rounded-full bg-d-border object-cover" />
                     : <div className="size-8 shrink-0 rounded-full bg-d-border" />}

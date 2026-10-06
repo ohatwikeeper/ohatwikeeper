@@ -2119,3 +2119,9 @@ html:has(.dash-scope) { scrollbar-color: var(--d-border) var(--d-bg); }
 .otp-err [data-slot="input-otp-slot"][data-index="6"] { animation-delay: 168ms }
 .otp-err [data-slot="input-otp-slot"][data-index="7"] { animation-delay: 196ms }
 @media (prefers-reduced-motion: reduce) { .otp-err [data-slot="input-otp-slot"] { animation: none; box-shadow: 0 0 0 1.5px rgba(248,113,113,.7) } }
+/* フォーカスで出るコンテナの枠をサイト全体で無効化(入力欄・ボタン等は対象外) */
+div:focus, div:focus-visible, main:focus, main:focus-visible, section:focus, section:focus-visible,
+article:focus, article:focus-visible, [tabindex="-1"]:focus, [tabindex="-1"]:focus-visible, [data-slot="sidebar-inset"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

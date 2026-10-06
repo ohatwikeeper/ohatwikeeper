@@ -18,11 +18,11 @@ function useBetaInfo() {
 
 function Patch({ text }: { text: string }) {
   return (
-    <pre className="overflow-x-auto bg-d-light px-4 py-2 text-xs leading-5">
+    <pre className="overflow-x-auto bg-d-light py-2 text-xs leading-5"><div className="w-max min-w-full">
       {text.split('\n').filter((l) => !/^(diff --git|index |--- |\+\+\+ )/.test(l)).map((l, i) => (
-        <div key={i} className={l.startsWith('+') ? 'bg-green-500/15 text-d-text' : l.startsWith('-') ? 'bg-red-500/15 text-d-text' : l.startsWith('@@') ? 'text-d-text3' : 'text-d-text2'}>{l || ' '}</div>
+        <div key={i} className={'px-4 ' + (l.startsWith('+') ? 'bg-green-500/15 text-green-300' : l.startsWith('-') ? 'bg-red-500/15 text-red-300' : l.startsWith('@@') ? 'text-d-text3' : 'text-d-text2')}>{l || ' '}</div>
       ))}
-    </pre>
+    </div></pre>
   )
 }
 
@@ -37,10 +37,13 @@ export default function BetaPage() {
       <PageHeader
         icon={diff ? GitCommitHorizontal : FlaskConical}
         title={diff ? 'beta の変更履歴' : 'beta 版の新機能'}
-        desc={diff ? `本番(${info?.base || '最新'})からの変更です。30秒ごとに自動更新されます` : '本番にはまだない機能です。30秒ごとに自動更新されます'}
-        right={diff
-          ? <Link to="/beta" className="text-sm text-d-text2 underline">新機能の一覧へ</Link>
-          : <Link to="/beta/diff" className="text-sm text-d-text2 underline">変更履歴(diff)を見る</Link>}
+        desc={diff ? `本番(${info?.base || '最新'})からの変更です` : '本番にはまだない機能です'}
+        right={<span className="flex items-center gap-4 text-sm">
+          {diff
+            ? <Link to="/beta" className="text-d-text2 underline">新機能の一覧へ</Link>
+            : <Link to="/beta/diff" className="text-d-text2 underline">変更履歴(diff)を見る</Link>}
+          <a href="https://beta.ohatwikeeper.com/dashboard" className="text-d-text underline">beta 版を試す</a>
+        </span>}
       />
       {!info && <p className="text-sm text-d-text3">読み込み中…</p>}
       {info && !diff && (lines.length

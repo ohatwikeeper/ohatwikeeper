@@ -154,7 +154,7 @@ export default function SearchView() {
                 <h2 className="mb-2 text-sm font-semibold text-d-text"><i className="bx bx-user mr-1" />{tr('sr.hUsers')}{data.type === 'all' && tr('sr.top', { n: data.per_page })}</h2>
                 <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
                   {data.users.map((u) => (
-                    <Link key={u.public_uuid} to={`/${u.public_uuid}`} className="flex items-center gap-3 rounded-xl border border-d-border bg-d-med p-3 transition-colors">
+                    <Link key={u.public_uuid} to={`/${u.public_uuid}`} data-user-card={u.public_uuid} className="flex items-center gap-3 rounded-xl border border-d-border bg-d-med p-3 transition-colors">
                       <Avatar src={u.x_icon} />
                       <div className="min-w-0 flex-1">
                         <div className="truncate font-semibold text-d-text"><Highlight text={u.name} q={hiQ} /></div>

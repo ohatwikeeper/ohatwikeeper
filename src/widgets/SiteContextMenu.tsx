@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, ArrowUpToLine, ArrowDownToLine, Command, Copy, Download, Eye, Trash2, ExternalLink, FileText, Image as ImageIcon, Link2, RotateCw, Search, Share2, Table2, TableProperties, TextCursorInput, Columns3, Send } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpToLine, ArrowDownToLine, Command, Copy, Check, Download, Eye, Trash2, ExternalLink, FileText, Image as ImageIcon, Link2, RotateCw, Search, Share2, Table2, TableProperties, TextCursorInput, Columns3, Send } from 'lucide-react'
 import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { toast } from '@/lib/toast'
 
@@ -11,7 +11,7 @@ type Ctx =
   | { kind: 'text'; text: string }
   | { kind: 'link'; href: string; text: string }
   | { kind: 'image'; src: string }
-  | { kind: 'record'; id: string; url: string; detail: string }
+  | { kind: 'record'; id: string; url: string; detail: string; sel: number }
   | { kind: 'cell'; cell: string; row: string; col: string; table: string }
 
 const NATIVE = 'input,textarea,select,[contenteditable=""],[contenteditable="true"],[data-ctx-native]'
@@ -24,7 +24,7 @@ function detect(t: Element): Ctx {
   const img = t.closest<HTMLImageElement>('img[src]')
   if (img) return { kind: 'image', src: img.currentSrc || img.src }
   const rec = t.closest<HTMLElement>('[data-ctx-record]')
-  if (rec) return { kind: 'record', id: rec.dataset.ctxRecord!, url: rec.dataset.ctxUrl ?? '', detail: rec.dataset.ctxDetail ?? '' }
+  if (rec) return { kind: 'record', id: rec.dataset.ctxRecord!, url: rec.dataset.ctxUrl ?? '', detail: rec.dataset.ctxDetail ?? '', sel: Number(document.querySelector<HTMLElement>('[data-ctx-sel]')?.dataset.ctxSel ?? 0) }
   const cell = t.closest<HTMLElement>('td,th')
   const row = t.closest<HTMLTableRowElement>('tr')
   if (cell && row) {
@@ -69,8 +69,11 @@ export default function SiteContextMenu({ children }: { children: ReactNode }) {
   }
   const palette = () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))
   const open = (u: string) => window.open(u, '_blank', 'noopener,noreferrer')
-  const Item = ({ icon: I, label, onSelect }: { icon: typeof Copy; label: string; onSelect: () => void }) => (
-    <ContextMenuItem onClick={onSelect}><I />{label}</ContextMenuItem>
+  const nav = (window as unknown as { navigation?: { canGoBack: boolean; canGoForward: boolean } }).navigation
+  const canBack = nav ? nav.canGoBack : history.length > 1
+  const canFwd = nav ? nav.canGoForward : true
+  const Item = ({ icon: I, label, onSelect, disabled }: { icon: typeof Copy; label: string; onSelect: () => void; disabled?: boolean }) => (
+    <ContextMenuItem onClick={onSelect} disabled={disabled}><I />{label}</ContextMenuItem>
   )
   return (
     <ContextMenu>
@@ -114,6 +117,10 @@ export default function SiteContextMenu({ children }: { children: ReactNode }) {
         )}
         {ctx.kind === 'record' && (
           <ContextMenuGroup>
+            {typeof document !== 'undefined' && document.querySelector('[data-ctx-bulk]') && <Item icon={Check} label={t('ctx.recSel', 'この行を選択 / 解除')} onSelect={() => document.dispatchEvent(new CustomEvent('ctx-record', { detail: { action: 'toggle', id: ctx.id } }))} />}
+            {ctx.sel > 0 && <Item icon={Table2} label={t('ctx.recCsv', '選択した{{n}}件をCSVでコピー', { n: ctx.sel })} onSelect={() => document.dispatchEvent(new CustomEvent('ctx-record', { detail: { action: 'bulk-csv', id: ctx.id } }))} />}
+            {ctx.sel > 0 && <Item icon={Link2} label={t('ctx.recUrls', '選択した{{n}}件のURLをコピー', { n: ctx.sel })} onSelect={() => document.dispatchEvent(new CustomEvent('ctx-record', { detail: { action: 'bulk-url', id: ctx.id } }))} />}
+            {ctx.sel > 0 && <Item icon={Trash2} label={t('ctx.recDelSel', '選択した{{n}}件を削除', { n: ctx.sel })} onSelect={() => document.dispatchEvent(new CustomEvent('ctx-record', { detail: { action: 'bulk-delete', id: ctx.id } }))} />}
             <Item icon={Eye} label={t('ctx.recDetail', 'ツイートの詳細を見る')} onSelect={() => document.dispatchEvent(new CustomEvent('ctx-record', { detail: { action: 'tweet', id: ctx.id } }))} />
             {ctx.detail && <Item icon={ExternalLink} label={t('ctx.recDetailPage', '詳細ページを開く')} onSelect={() => open(`/details/${ctx.detail}`)} />}
             {ctx.url && <Item icon={ExternalLink} label={t('ctx.recOrig', '元のツイートを開く')} onSelect={() => open(ctx.url)} />}
@@ -132,8 +139,8 @@ export default function SiteContextMenu({ children }: { children: ReactNode }) {
           </ContextMenuGroup>
         )}
         <ContextMenuGroup>
-          <Item icon={ArrowLeft} label={t('ctx.back', '戻る')} onSelect={() => history.back()} />
-          <Item icon={ArrowRight} label={t('ctx.forward', '進む')} onSelect={() => history.forward()} />
+          <Item icon={ArrowLeft} label={t('ctx.back', '戻る')} disabled={!canBack} onSelect={() => history.back()} />
+          <Item icon={ArrowRight} label={t('ctx.forward', '進む')} disabled={!canFwd} onSelect={() => history.forward()} />
           <Item icon={RotateCw} label={t('ctx.reload', '再読み込み')} onSelect={() => location.reload()} />
         </ContextMenuGroup>
         <ContextMenuSeparator />

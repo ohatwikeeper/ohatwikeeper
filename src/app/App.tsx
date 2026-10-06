@@ -8,6 +8,8 @@ import { GlimmProvider } from 'glimm/react'
 // import { bindGlobalClickSounds } from '@/lib/cuelume-sound'
 import ActionWidget from '@/widgets/ActionWidget'
 import CommandPalette from '@/widgets/CommandPalette'
+import UserHoverCard from '@/widgets/UserHoverCard'
+import BetaShortcuts from '@/widgets/BetaShortcuts'
 import SiteContextMenu from '@/widgets/SiteContextMenu'
 import SplashCursor from '@/widgets/SplashCursor'
 import DonationBar from '@/components/dashboard-ui/DonationBar'
@@ -101,8 +103,6 @@ function App() {
             <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
             <Route path="/auth/lapount/callback" element={<Suspense fallback={<PageLoader />}><LapountCallbackPage /></Suspense>} />
             <Route path="/confirm_login" element={<Suspense fallback={<PageLoader />}><ConfirmLoginPage /></Suspense>} />
-            <Route path="/beta" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
-            <Route path="/beta/diff" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
           <Route path="/" element={<TopPage />} />
           <Route element={<AppShell />}>
           <Route element={<DashboardPage />}>
@@ -143,6 +143,8 @@ function App() {
           <Route path="/patchnote" element={<Suspense fallback={<PageLoader />}><PatchnotesPage /></Suspense>} />
           <Route path="/patchnote/:version" element={<Suspense fallback={<PageLoader />}><PatchnotesPage /></Suspense>} />
           <Route path="/patchnote.php" element={<Suspense fallback={<PageLoader />}><PatchnotesPage /></Suspense>} />
+          <Route path="/beta" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
+          <Route path="/beta/diff" element={<Suspense fallback={<PageLoader />}><BetaPage /></Suspense>} />
           <Route path="/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
           <Route path="/policy" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
           <Route path="/policy.php" element={<Suspense fallback={<PageLoader />}><PolicyPage /></Suspense>} />
@@ -188,6 +190,8 @@ function App() {
         </MaintenanceGate>
         <NotAdmin><ActionWidget /></NotAdmin>
         <CommandPalette />
+        <BetaShortcuts />
+        <UserHoverCard />
         <OnboardGate />
         </SiteContextMenu>
       </GlimmProvider>
