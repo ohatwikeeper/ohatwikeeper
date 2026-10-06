@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ConfirmDialog } from '@/components/ui/alert-dialog'
+import { ConfirmPill } from '@/components/ui/confirm-pill'
 import { setConfirmHandler, type ConfirmOptions } from '@/lib/confirm'
 
+// 確認は大きなモーダルではなく、ぼかし背景の上に出る小さなピル(質問+ボタンのみ)
 export default function ConfirmHost({ children }: { children: ReactNode }) {
   const [opt, setOpt] = useState<ConfirmOptions | null>(null)
   const done = useRef<((ok: boolean) => void) | null>(null)
@@ -16,15 +17,7 @@ export default function ConfirmHost({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      <ConfirmDialog
-        open={!!opt}
-        onOpenChange={(o) => { if (!o) close(false) }}
-        title={opt?.title ?? ''}
-        description={opt?.description}
-        confirmLabel={opt?.confirmLabel}
-        destructive={opt?.destructive}
-        onConfirm={() => close(true)}
-      />
+      <ConfirmPill open={!!opt} title={opt?.title ?? ''} confirmLabel={opt?.confirmLabel} destructive={opt?.destructive} onCancel={() => close(false)} onConfirm={() => close(true)} />
     </>
   )
 }

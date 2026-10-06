@@ -14,6 +14,7 @@ import { HoldToDeleteButton } from '@/components/ui/hold-to-delete-button'
 import { AnimatePresence, motion } from 'motion/react'
 import { dbtn } from '@/components/dashboard-ui/DButton'
 import ViewToggle from '@/features/records/ViewToggle'
+import RecordDeletePanel from '@/features/records/RecordDeletePanel'
 import { ConfirmDialog } from '@/components/ui/alert-dialog'
 import { Checkbox } from '@/components/animate-ui/components/headless/checkbox'
 import { toast } from '@/lib/toast'
@@ -286,7 +287,7 @@ export default function RecordsSection(props: Props) {
 
   return (
     <>
-      <ConfirmDialog open={delId !== null} onOpenChange={(o) => !o && setDelId(null)} title={t('rc.delete')} onConfirm={() => { if (delId) props.onDelete?.(delId) }} />
+      <RecordDeletePanel record={records.find((r) => r.uniqid === delId) ?? null} onCancel={() => setDelId(null)} onConfirm={(id) => { setDelId(null); props.onDelete?.(id) }} />
       {IS_BETA && <ConfirmDialog open={bulkDel} onOpenChange={setBulkDel} title={`選択した${picked.length}件を削除`} onConfirm={() => { picked.forEach((r) => props.onDelete?.(r.uniqid)); setSel(new Set()) }} />}
       {IS_BETA && sel.size > 0 && (
         <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full border border-d-border bg-d-bg px-5 py-2 text-sm shadow-lg">
