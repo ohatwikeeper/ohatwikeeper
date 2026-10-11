@@ -6,7 +6,7 @@ import { useCrumbs, useCrumbLabels } from './crumbStore'
 
 // 先頭セグメント → 翻訳キー or 固定ラベル(それ以外は公開UUIDとして扱う)
 const TOP: Record<string, string> = {
-  dashboard: 'nav.dashboard', folder: 'nav.folder', notification: 'nav.notification', 'r-links': 'nav.rlinks', settings: 'nav.settings',
+  dashboard: 'nav.dashboard', folder: 'nav.folder', notification: 'nav.notification', 'r-links': 'nav.rlinks', settings: 'nav.settings', security: 'sec.tab',
   settings_api: 'bc.settingsApi', recap: 'nav.dashboard', tools: 'nav.tools', search: 'nav.search', dev: 'nav.dev',
   terminal: 'nav.terminal', howtouse: 'nav.howtouse', patchnote: 'nav.patchnote', terms: 'nav.terms', policy: 'nav.policy',
   ranking: 'nav.ranking', cli: 'nav.cli', diff: 'nav.diff', survey: 'nav.survey', extensions: 'nav.extension', details: 'bc.details', u: 'bc.user',

@@ -28,7 +28,7 @@ import AppShell from '@/app/layouts/AppShell'
 import SiteLayout from '@/app/layouts/SiteLayout'
 import { RequireLogin, RedirectToOwn } from '@/components/dashboard-ui/LoginRequired'
 const HandleSearchPage = lazy(() => import('@/features/handle/page'))
-const SETTINGS_TABS = ['account', 'notify', 'apikey', 'api', 'webhooks', 'webhook', 'widgets', 'theme', 'email']
+const SETTINGS_TABS = ['account', 'notify', 'apikey', 'api', 'webhooks', 'webhook', 'widgets', 'theme', 'email', 'security', 'sessions']
 /** 未知のタブは設定画面ではなく 404 にする */
 function SettingsTabRoute() {
   const { tab } = useParams()

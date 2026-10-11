@@ -9,7 +9,9 @@ import DModal from '@/components/dashboard-ui/DModal'
 import { DButton } from '@/components/dashboard-ui/DButton'
 import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/arc/date-picker/date-picker'
-import { Progress } from '@/components/arc/progress/progress'
+import { Progress, ProgressLabel, ProgressValue } from '@/components/ui/progress'
+import { Button } from '@/components/ui/button'
+import { CircleCheckIcon, TriangleAlertIcon, XIcon } from 'lucide-react'
 
 const toDate = (v: string) => (v ? new Date(`${v}T00:00:00`) : undefined)
 const fromDate = (d?: Date) => (d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` : '')
@@ -206,17 +208,70 @@ export function SurveyModal({ open, onClose }: { open: boolean; onClose: (noShow
 }
 
 /* ── 一括更新・一括登録の進捗オーバーレイ ── */
-export function ProgressOverlay({ state }: { state: { text: string; done?: number; total?: number } | null }) {
+export type UpdateCounts = { updated: number; unchanged: number; failed: number }
+export type ProgressState = {
+  text: string
+  done?: number
+  total?: number
+  counts?: UpdateCounts
+  /** 完了サマリー。指定すると結果カードを表示し、onClose で閉じる */
+  summary?: { counts: UpdateCounts; total: number; elapsedMs: number; scraperError: boolean; onClose: () => void }
+}
+
+function Stat({ label, value, tone }: { label: string; value: number; tone?: 'ok' | 'bad' }) {
+  const color = tone === 'bad' && value > 0 ? 'text-red-400' : tone === 'ok' && value > 0 ? 'text-emerald-400' : 'text-d-text'
+  return (
+    <div className="flex flex-1 flex-col gap-0.5">
+      <span className="text-xs text-d-text2">{label}</span>
+      <span className={`text-xl font-semibold tabular-nums ${color}`}>{value.toLocaleString()}</span>
+    </div>
+  )
+}
+
+/** 画面をふさがない右下の進捗パネル(更新中は操作を妨げず、完了後は×で閉じる) */
+export function ProgressOverlay({ state }: { state: ProgressState | null }) {
   const { t } = useTranslation()
   if (!state) return null
   const pct = state.total ? Math.min(100, Math.round(((state.done ?? 0) / state.total) * 100)) : 0
+  const sm = state.summary
+  const counts = sm?.counts ?? state.counts
+  const hasIssue = !!sm && (sm.counts.failed > 0 || sm.scraperError)
   return (
-    <div className="dash-vars fixed inset-0 z-[2000] flex flex-col items-center justify-center gap-4 bg-black/80">
-      <Spinner />
-      <p className="text-base font-medium text-d-text">{state.text}</p>
+    <div
+      className="dash-vars fixed right-4 bottom-4 z-[1200] flex w-[min(380px,calc(100vw-2rem))] flex-col gap-4 rounded-2xl border border-d-border bg-d-med p-4 shadow-2xl"
+      role="status" aria-live="polite"
+    >
+      <div className="flex items-start gap-2.5">
+        <span className="mt-0.5 shrink-0">
+          {sm ? (hasIssue ? <TriangleAlertIcon className="size-4 text-amber-400" /> : <CircleCheckIcon className="size-4 text-emerald-400" />) : <Spinner />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-d-text">{sm ? t('rc.pgDone') : state.text}</p>
+          {sm ? (
+            <p className="text-xs text-d-text2">
+              {t('rc.pgTotal')} {sm.total.toLocaleString()} · {t('rc.pgElapsed')} {(sm.elapsedMs / 1000).toFixed(1)}s
+            </p>
+          ) : null}
+        </div>
+        {sm ? (
+          <Button variant="ghost" size="icon-sm" aria-label={t('rc.pgClose')} onClick={sm.onClose}><XIcon /></Button>
+        ) : null}
+      </div>
       {state.total ? (
-        <Progress value={pct} label={t('rc.progress')} showValue className="w-[min(360px,80vw)]" />
+        <Progress value={sm ? 100 : pct}>
+          <ProgressLabel className="text-xs font-normal text-d-text2">{t('rc.progress')}</ProgressLabel>
+          <ProgressValue className="text-xs text-d-text2" />
+        </Progress>
       ) : null}
+      {counts ? (
+        <div className="flex gap-3 divide-x divide-d-border [&>*:not(:first-child)]:pl-3">
+          <Stat label={t('rc.pgUpdated')} value={counts.updated} tone="ok" />
+          <Stat label={t('rc.pgUnchanged')} value={counts.unchanged} />
+          <Stat label={t('rc.pgFailed')} value={counts.failed} tone="bad" />
+        </div>
+      ) : null}
+      {sm?.counts.failed ? <p className="text-xs leading-relaxed text-d-text2">{t('rc.pgFailHint')}</p> : null}
+      {sm?.scraperError ? <p className="text-xs leading-relaxed text-red-400">{t('rc.pgScraperErr')}</p> : null}
     </div>
   )
 }

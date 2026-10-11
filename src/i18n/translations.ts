@@ -11,6 +11,7 @@ import top from './areas/top'
 import auth from './areas/auth'
 import survey from './areas/survey'
 import settings from './areas/settings'
+import security from './areas/security'
 import records from './areas/records'
 import awards from './areas/awards'
 import graph from './areas/graph'
@@ -603,7 +604,7 @@ const base = {
 }
 
 // 画面領域ごとの訳(areas/*.ts)を既存の辞書へ合成する
-const areas = [common, navbar, sharetext, graph3d, palette, action, top, auth, survey, settings, records, awards, graph, rlinks, folder, tools, cliext, devterm, errdash, pagesb, pagesc, libui, shared, sharedb, longpg, palette2, onboard2, onboard3, onboard4, onboard5, profile6]
+const areas = [common, navbar, sharetext, graph3d, palette, action, top, auth, survey, settings, security, records, awards, graph, rlinks, folder, tools, cliext, devterm, errdash, pagesb, pagesc, libui, shared, sharedb, longpg, palette2, onboard2, onboard3, onboard4, onboard5, profile6]
 export const resources = Object.fromEntries(
   Object.entries(base).map(([lng, v]) => [lng, { translation: Object.assign({}, v.translation, ...areas.map((a) => a[lng as keyof typeof a])) }]),
 ) as typeof base

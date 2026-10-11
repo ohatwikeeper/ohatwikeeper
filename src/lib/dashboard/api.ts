@@ -46,7 +46,7 @@ export async function apiGet<T = unknown>(path: string): Promise<T> {
 
 export async function apiSend<T = unknown>(
   path: string,
-  method: 'POST' | 'DELETE',
+  method: 'POST' | 'DELETE' | 'PATCH',
   body?: unknown,
 ): Promise<T> {
   return parse(

@@ -61,7 +61,7 @@ const SECTIONS: { title: string; body: React.ReactNode[] }[] = [
     '運営は、必要に応じて本ポリシーを改定することがあります。重要な変更は公式サイト内でお知らせします。',
   ] },
   { title: 'お問い合わせ', body: [
-    <>本ポリシーに関するお問い合わせは、<a href="https://discord.ohatwikeeper.com" target="_blank" rel="noopener noreferrer" className="text-d-text2 hover:text-d-text">公式Discordサーバー</a>、または <a href="mailto:contact-us@lapius7.com" className="text-d-text2 hover:text-d-text">contact-us@lapius7.com</a> までお願いします。</>,
+    <>本ポリシーに関するお問い合わせは、<a href="https://discord.ohatwikeeper.com" target="_blank" rel="noopener noreferrer" className="text-d-text2 hover:text-d-text">公式Discordサーバー</a>、または <a href="mailto:contact@ohatwikeeper.com" className="text-d-text2 hover:text-d-text">contact@ohatwikeeper.com</a> までお願いします。</>,
   ] },
   { title: '運営情報', body: [
     <><B>名称:</B> Lapius7 開発チーム / おはツイKeeper開発部</>,
