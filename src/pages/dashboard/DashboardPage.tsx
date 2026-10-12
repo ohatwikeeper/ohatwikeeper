@@ -63,7 +63,24 @@ export default function DashboardPage() {
   const [zipOpen, setZipOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(true)
   const [surveyOpen, setSurveyOpen] = useState(true)
-  const [progress, setProgress] = useState<Progress>(null)
+  // 更新の進捗は localStorage に残し、リロードしても×を押すまで表示し続ける
+  const PG_KEY = 'dash-update-progress'
+  const [progress, setProgress] = useState<Progress>(() => {
+    try {
+      const o = JSON.parse(localStorage.getItem(PG_KEY) ?? 'null')
+      if (!o) return null
+      const clear = () => { localStorage.removeItem(PG_KEY); setProgress(null) }
+      if (o.summary) return { ...o, summary: { ...o.summary, onClose: clear } }
+      return { ...o, text: i18n.t('dp.interrupted'), onDismiss: clear }
+    } catch { return null }
+  })
+  useEffect(() => {
+    if (progress && progress.total) {
+      const { onDismiss: _d, ...rest } = progress as any
+      if (rest.summary) rest.summary = { ...rest.summary, onClose: undefined }
+      localStorage.setItem(PG_KEY, JSON.stringify(rest))
+    } else if (!progress) localStorage.removeItem(PG_KEY)
+  }, [progress])
 
   useEffect(() => { if (isHome) document.title = i18n.t('dp.doc') }, [isHome])
   // セットアップ(必須設定・初回オンボード)が終わるまで自動ツアーは出さない
@@ -140,12 +157,12 @@ export default function DashboardPage() {
   }
 
   /** 過去1ヶ月/全件の記録を50件×3並列で更新する(dashboard.php の handleBatchUpdateProcess 相当) */
-  const runUpdate = async (period: 'month' | 'all') => {
+  const runUpdate = async (period: 'month' | 'all' | 'range', range?: { from: string; to: string }) => {
     try {
       setProgress({ text: i18n.t('dp.preparing') })
       // プロフィール更新は待たずに並行実行(進捗表示を遅らせない)
       const profileUpdate = apiSend('update_profile', 'POST').catch(() => {})
-      const { ids } = await apiGet<{ ids: number[] }>(`record_ids?period=${period}`)
+      const { ids } = await apiGet<{ ids: number[] }>(`record_ids?period=${period}${range ? `&from=${range.from}&to=${range.to}` : ''}`)
       if (ids.length === 0) {
         await profileUpdate
         setProgress({ text: i18n.t('dp.nothing') })
@@ -153,13 +170,14 @@ export default function DashboardPage() {
         return
       }
       // 小さなバッチを3並列のワーカーで消化し、1バッチ終わるたびに進捗を反映する
-      const size = 10, workers = 3
+      const size = 10, workers = 2
       const chunks: number[][] = []
       for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size))
       const counts = { updated: 0, unchanged: 0, failed: 0 }
       let processed = 0, scraperError = false, next = 0
       const startedAt = Date.now()
-      type BatchRes = { updated_count: number; unchanged_count?: number; failed_count?: number; scraper_error?: boolean }
+      type BatchRes = { updated_count: number; unchanged_count?: number; failed_count?: number; failed_ids?: number[]; scraper_error?: boolean }
+      const failedIds: number[] = []
       const report = () => setProgress({ text: i18n.t('dp.updating', { a: processed, b: ids.length }), done: processed, total: ids.length, counts: { ...counts } })
       report()
       const worker = async () => {
@@ -167,11 +185,12 @@ export default function DashboardPage() {
           const c = chunks[next++]
           // 1バッチの失敗で全体を止めず、失敗件数として集計する
           const r = await apiSend<BatchRes>('update_batch', 'POST', { ids: c }).catch(() => null)
-          if (!r) { counts.failed += c.length; scraperError = true }
+          if (!r) { counts.failed += c.length; failedIds.push(...c); scraperError = true }
           else {
             counts.updated += r.updated_count
             counts.unchanged += r.unchanged_count ?? 0
             counts.failed += r.failed_count ?? 0
+            failedIds.push(...(r.failed_ids ?? []))
             if (r.scraper_error) scraperError = true
           }
           processed += c.length
@@ -179,6 +198,21 @@ export default function DashboardPage() {
         }
       }
       await Promise.all(Array.from({ length: Math.min(workers, chunks.length) }, worker))
+      // 取得に失敗した分は、間を置いて1本ずつ最大2回やり直す(X側の一時的な制限・混雑対策)
+      for (let round = 0; round < 2 && failedIds.length; round++) {
+        await new Promise((res) => setTimeout(res, 4000 * (round + 1)))
+        const todo = failedIds.splice(0)
+        for (let i = 0; i < todo.length; i += size) {
+          const c = todo.slice(i, i + size)
+          const r = await apiSend<BatchRes>('update_batch', 'POST', { ids: c }).catch(() => null)
+          if (!r) { failedIds.push(...c); continue }
+          counts.failed -= c.length - (r.failed_count ?? 0)
+          counts.updated += r.updated_count
+          counts.unchanged += r.unchanged_count ?? 0
+          failedIds.push(...(r.failed_ids ?? []))
+          report()
+        }
+      }
       await profileUpdate
       await refreshAll()
       setProgress({

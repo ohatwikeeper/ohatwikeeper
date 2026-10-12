@@ -113,6 +113,7 @@ export default defineArea({
   'rc.fetching': ['取得中', 'Fetching', '가져오는 중', 'Wird abgerufen', 'Récupération', 'Obteniendo', '获取中', 'Obtendo', 'Recupero', 'Загрузка'],
   'rc.done': ['完了', 'Done', '완료', 'Fertig', 'Terminé', 'Listo', '完成', 'Concluído', 'Fatto', 'Готово'],
   'rc.bulk': ['まとめて登録', 'Bulk register', '일괄 등록', 'Gesammelt registrieren', 'Enregistrer en lot', 'Registrar en lote', '批量登记', 'Registrar em lote', 'Registra in blocco', 'Массовая регистрация'],
+  'rc.updRange': ['期間を指定して更新', 'Update selected period', '기간 지정 갱신', 'Zeitraum aktualisieren', 'Mettre à jour la période', 'Actualizar el período', '更新指定时间段', 'Atualizar o período', 'Aggiorna il periodo', 'Обновить за период'],
   'rc.updMonth': ['過去1ヶ月分を更新', 'Update past month', '지난 1개월분 갱신', 'Letzten Monat aktualisieren', 'Mettre à jour le dernier mois', 'Actualizar el último mes', '更新过去 1 个月', 'Atualizar o último mês', 'Aggiorna ultimo mese', 'Обновить за месяц'],
   'rc.zipDl': ['画像をZIPでDL', 'Images as ZIP', '이미지 ZIP 다운로드', 'Bilder als ZIP', 'Images en ZIP', 'Imágenes en ZIP', '图片 ZIP 下载', 'Imagens em ZIP', 'Immagini in ZIP', 'Изображения в ZIP'],
   'rc.vList': ['リスト表示', 'List view', '리스트 보기', 'Listenansicht', 'Vue liste', 'Vista de lista', '列表显示', 'Visualização em lista', 'Vista elenco', 'Список'],

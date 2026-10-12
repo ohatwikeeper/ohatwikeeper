@@ -215,6 +215,8 @@ export type ProgressState = {
   total?: number
   counts?: UpdateCounts
   /** 完了サマリー。指定すると結果カードを表示し、onClose で閉じる */
+  /** 指定すると×ボタンを出す(リロードで中断された更新の表示用) */
+  onDismiss?: () => void
   summary?: { counts: UpdateCounts; total: number; elapsedMs: number; scraperError: boolean; onClose: () => void }
 }
 
@@ -243,7 +245,7 @@ export function ProgressOverlay({ state }: { state: ProgressState | null }) {
     >
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 shrink-0">
-          {sm ? (hasIssue ? <TriangleAlertIcon className="size-4 text-amber-400" /> : <CircleCheckIcon className="size-4 text-emerald-400" />) : <Spinner />}
+          {state.onDismiss ? <TriangleAlertIcon className="size-4 text-amber-400" /> : sm ? (hasIssue ? <TriangleAlertIcon className="size-4 text-amber-400" /> : <CircleCheckIcon className="size-4 text-emerald-400" />) : <Spinner />}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-d-text">{sm ? t('rc.pgDone') : state.text}</p>
@@ -253,8 +255,8 @@ export function ProgressOverlay({ state }: { state: ProgressState | null }) {
             </p>
           ) : null}
         </div>
-        {sm ? (
-          <Button variant="ghost" size="icon-sm" aria-label={t('rc.pgClose')} onClick={sm.onClose}><XIcon /></Button>
+        {sm || state.onDismiss ? (
+          <Button variant="ghost" size="icon-sm" aria-label={t('rc.pgClose')} onClick={sm ? sm.onClose : state.onDismiss}><XIcon /></Button>
         ) : null}
       </div>
       {state.total ? (
