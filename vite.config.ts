@@ -16,10 +16,11 @@ const commit = (() => {
 })()
 
 const version = `${ymd}-${commit.slice(0, 16)}`
-// 同じバージョンを top-dist/version.json にも出す。開いているページはこれを見て、新しいデプロイに気づいたら再読み込みを促す(UpdateWatcher)
+// 同じバージョンを top-dist/version.json にも出す。開いているページはこれを見て、新しいデプロイに気づいたら再読み込みを促す(UpdateWatcher)。
+// commit(40桁)も入れるのは、本番昇格時のフッターID書き換え(promote-on-vps.sh)の対象に含めて、JS 側と同じ値に揃えるため
 const versionFile: Plugin = {
   name: 'version-file',
-  generateBundle() { this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version }) }) },
+  generateBundle() { this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version, commit }) }) },
 }
 
 export default defineConfig({
