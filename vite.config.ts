@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
@@ -15,9 +15,16 @@ const commit = (() => {
   try { return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return '0'.repeat(40) }
 })()
 
+const version = `${ymd}-${commit.slice(0, 16)}`
+// 同じバージョンを top-dist/version.json にも出す。開いているページはこれを見て、新しいデプロイに気づいたら再読み込みを促す(UpdateWatcher)
+const versionFile: Plugin = {
+  name: 'version-file',
+  generateBundle() { this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version }) }) },
+}
+
 export default defineConfig({
-  define: { __BUILD_REPO__: JSON.stringify(repo), __BUILD_VERSION__: JSON.stringify(`${ymd}-${commit.slice(0, 16)}`), __BUILD_COMMIT__: JSON.stringify(commit) },
-  plugins: [react(), tailwindcss()],
+  define: { __BUILD_REPO__: JSON.stringify(repo), __BUILD_VERSION__: JSON.stringify(version), __BUILD_COMMIT__: JSON.stringify(commit) },
+  plugins: [react(), tailwindcss(), versionFile],
   base: '/',
   // 遅延ロードのページ内の依存も起動時にまとめて最適化する(後から見つかって再最適化→504 Outdated Optimize Dep になるのを防ぐ)
   optimizeDeps: { entries: ['index.html', 'src/**/*.{ts,tsx}'] },

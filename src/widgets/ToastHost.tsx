@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ToastStack, ToastStackProvider, useToastStack } from '@/components/arc/toast-stack/toast-stack'
 import { setToastApi } from '@/lib/toast'
+import UpdateWatcher from '@/widgets/UpdateWatcher'
 
 function Bridge() {
   const { toast, update, dismiss } = useToastStack()
@@ -17,6 +18,7 @@ export default function ToastHost({ children }: { children: React.ReactNode }) {
     <ToastStackProvider>
       {children}
       <Bridge />
+      <UpdateWatcher />
       <ToastStack position="bottom-left" />
     </ToastStackProvider>
   )
