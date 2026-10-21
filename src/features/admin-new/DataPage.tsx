@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { SimpleSelect } from '@/components/ui/simple-select'
 import { ConfirmDialog } from '@/components/ui/alert-dialog'
 import { loadSession } from '@/lib/session'
+import { IdentityOtp } from '../admin/IdentityOtp'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
 import { ALL_ITEMS } from './nav'
@@ -88,6 +89,7 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
               ))}
             </div>
           )}
+          {row && view === 'users' && <IdentityOtp userId={Number(row.id)} />}
           {row && view === 'users' && (
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="outline" onClick={async () => {
