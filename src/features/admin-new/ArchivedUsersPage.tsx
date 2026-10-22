@@ -57,8 +57,8 @@ export default function ArchivedUsersPage() {
       <ConfirmDialog open={!!target} onOpenChange={(o) => !o && setTarget(null)} title="このユーザーを復元しますか？"
         description={target ? `@${target.x_username}(ID ${target.user_id})の全データを元に戻します。` : ''} confirmLabel="復元する"
         onConfirm={async () => {
-          const d = await adminTry(`archive/restore/${target!.id}`, { method: 'POST', json: {} })
-          if (d) { toast.success('復元しました'); load() }
+          const d = await adminTry<{ mailed: boolean }>(`archive/restore/${target!.id}`, { method: 'POST', json: {} })
+          if (d) { toast.success(d.mailed ? '復元しました(通知メール送信済み)' : '復元しました(通知メールなし)'); load() }
           setTarget(null)
         }} />
     </Shell>
