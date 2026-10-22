@@ -152,16 +152,23 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
       </SheetContent>
     </Sheet>
       <Dialog open={arc} onOpenChange={setArc}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md" showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>アカウントを削除(退避)</DialogTitle>
-            <DialogDescription>全データを削除済みユーザーへ移動します。「削除済みユーザー」から復元できます。本人にはメールで通知します。</DialogDescription>
+            <DialogTitle className="text-base">アカウントを削除</DialogTitle>
+            <DialogDescription>データは「削除済みユーザー」へ移動し、あとから復元できます。本人には削除のメールが届きます。</DialogDescription>
           </DialogHeader>
-          <Label>理由(お問い合わせ内容など)</Label>
-          <Textarea value={arcReason} onChange={(e) => setArcReason(e.target.value)} />
-          <Label>確認のため「{String(row?.x_username ?? row?.id)}」と入力</Label>
-          <Input value={arcConfirm} onChange={(e) => setArcConfirm(e.target.value)} />
-          <DialogFooter>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="arc-reason" className="text-xs text-d-text2">理由(お問い合わせ内容など)</Label>
+              <Textarea id="arc-reason" rows={3} placeholder="例: ユーザーからの削除依頼(Discord チケット #123)" value={arcReason} onChange={(e) => setArcReason(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="arc-confirm" className="text-xs text-d-text2">確認のため <code className="rounded bg-d-med px-1 py-0.5 text-d-text">{String(row?.x_username ?? row?.id)}</code> と入力</Label>
+              <Input id="arc-confirm" autoComplete="off" value={arcConfirm} onChange={(e) => setArcConfirm(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter className="m-0 border-0 bg-transparent p-0">
+            <Button variant="outline" onClick={() => setArc(false)}>キャンセル</Button>
             <Button variant="destructive" disabled={!arcReason.trim() || arcConfirm !== String(row?.x_username ?? row?.id)} onClick={async () => {
               const d = await adminTry<{ mailed: boolean }>(`archive/users/${row!.id}/archive`, { method: 'POST', json: { reason: arcReason, confirm: arcConfirm } })
               if (d) { toast.success(d.mailed ? '削除しました(通知メール送信済み)' : '削除しました(通知メールなし)'); setArc(false); onClose(); onChanged() }
