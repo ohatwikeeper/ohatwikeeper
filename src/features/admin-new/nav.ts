@@ -8,6 +8,7 @@ export const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: 'ユーザー', items: [
       { to: D('users'), label: 'ユーザー一覧', icon: Users, keywords: 'users ユーザー' },
+      { to: '/admin-new/archived-users', label: '削除済みユーザー', icon: Users, keywords: 'archive 削除 復元' },
       { to: D('emails'), label: '登録メールアドレス', icon: Mail, keywords: 'email メール' },
       { to: '/admin-new/beta', label: 'ベータ招待', icon: ShieldCheck, keywords: 'beta' },
     ],

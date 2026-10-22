@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { SimpleSelect } from '@/components/ui/simple-select'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ConfirmDialog } from '@/components/ui/alert-dialog'
 import { loadSession } from '@/lib/session'
 import { IdentityOtp } from '../admin/IdentityOtp'
@@ -63,6 +64,9 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
 }) {
   const [sum, setSum] = useState<Record<string, number> | null>(null)
   const [note, setNote] = useState('')
+  const [arc, setArc] = useState(false)
+  const [arcReason, setArcReason] = useState('')
+  const [arcConfirm, setArcConfirm] = useState('')
   const entries = row ? Object.entries(row).filter(([k]) => k !== '__list') : []
   useEffect(() => { setNote(String(row?.admin_note ?? '')) }, [row])
   useEffect(() => {
@@ -71,6 +75,7 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
   }, [row, view])
   const post = async (path: string, json?: unknown) => { const d = await adminTry(`data/${path}`, { method: 'POST', json: json ?? {} }); if (d) { toast.success('更新しました'); onChanged() } return !!d }
   return (
+    <>
     <Sheet open={!!row} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl" onKeyDown={(e) => {
         if (e.target instanceof HTMLElement && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return
@@ -101,6 +106,7 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
               }}>このユーザーとしてログイン</Button>
               <Button size="sm" variant="outline" nativeButton={false} render={<Link to={`/admin-new/data/api-logs?q=${encodeURIComponent(String(row.x_username ?? row.id))}`} />}>APIログ</Button>
               <Button size="sm" variant="outline" nativeButton={false} render={<Link to={`/admin-new/data/user-actions?q=${encodeURIComponent(String(row.id))}`} />}>操作ログ</Button>
+              <Button size="sm" variant="destructive" onClick={() => { setArcReason(''); setArcConfirm(''); setArc(true) }}><Trash2 className="size-3.5" />アカウント削除</Button>
               <Button size="sm" variant="outline" nativeButton={false} render={<Link to={`/admin-new/data/api-errors?q=${encodeURIComponent(String(row.id))}`} />}>エラー</Button>
             </div>
           )}
@@ -145,6 +151,25 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
         </div>
       </SheetContent>
     </Sheet>
+      <Dialog open={arc} onOpenChange={setArc}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>アカウントを削除(退避)</DialogTitle>
+            <DialogDescription>全データを削除済みユーザーへ移動します。「削除済みユーザー」から復元できます。本人にはメールで通知します。</DialogDescription>
+          </DialogHeader>
+          <Label>理由(お問い合わせ内容など)</Label>
+          <Textarea value={arcReason} onChange={(e) => setArcReason(e.target.value)} />
+          <Label>確認のため「{String(row?.x_username ?? row?.id)}」と入力</Label>
+          <Input value={arcConfirm} onChange={(e) => setArcConfirm(e.target.value)} />
+          <DialogFooter>
+            <Button variant="destructive" disabled={!arcReason.trim() || arcConfirm !== String(row?.x_username ?? row?.id)} onClick={async () => {
+              const d = await adminTry<{ mailed: boolean }>(`archive/users/${row!.id}/archive`, { method: 'POST', json: { reason: arcReason, confirm: arcConfirm } })
+              if (d) { toast.success(d.mailed ? '削除しました(通知メール送信済み)' : '削除しました(通知メールなし)'); setArc(false); onClose(); onChanged() }
+            }}>削除する</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
@@ -171,6 +196,9 @@ export default function DataPage() {
   useEffect(() => { try { setMyCols(JSON.parse(localStorage.getItem(colKey) ?? '[]')) } catch { setMyCols([]) }; setQInput(sp.get('q') ?? ''); setSelIdx(null) }, [view]) // eslint-disable-line react-hooks/exhaustive-deps
   const page = Math.max(1, Number(sp.get('page')) || 1)
   const asc = sp.get('dir') === 'asc'
+  const sortCol = sp.get('sort') ?? ''
+  // 列ヘッダのクリック: 降順 → 昇順 → 解除
+  const sortBy = (c: string) => patch(sortCol !== c ? { sort: c, dir: null } : !asc ? { sort: c, dir: 'asc' } : { sort: null, dir: null })
   const qs = useMemo(() => { const n = new URLSearchParams(sp); n.delete('page'); return n.toString() }, [sp])
   const patch = useCallback((o: Record<string, string | null>) => {
     setSp((p) => { const n = new URLSearchParams(p); for (const [k, v] of Object.entries(o)) v ? n.set(k, v) : n.delete(k); if (!('page' in o)) n.delete('page'); return n }, { replace: true })
@@ -233,7 +261,7 @@ export default function DataPage() {
             <Input value={qInput} onChange={(e) => setQInput(e.target.value)} placeholder="検索(ID・ユーザー名・リクエストID等)" className="h-9 pl-8" />
           </div>
           {res?.dated && <DateRangePicker value={dr} onChange={(v) => patch({ from: v?.from ? format(v.from, 'yyyy-MM-dd') : null, to: v?.to ? format(v.to, 'yyyy-MM-dd') : null })} />}
-          <Button variant="outline" size="sm" className="h-9 !text-d-text" onClick={() => patch({ dir: asc ? null : 'asc' })}>{asc ? <ArrowUpWideNarrow className="size-3.5" /> : <ArrowDownWideNarrow className="size-3.5" />}{asc ? '古い順' : '新しい順'}</Button>
+          <Button variant="outline" size="sm" className="h-9 !text-d-text" onClick={() => patch({ dir: asc ? null : 'asc' })}>{asc ? <ArrowUpWideNarrow className="size-3.5" /> : <ArrowDownWideNarrow className="size-3.5" />}{sortCol ? (asc ? '昇順' : '降順') : asc ? '古い順' : '新しい順'}</Button>
           <Popover>
             <PopoverTrigger render={<Button variant="outline" size="sm" className="h-9 !text-d-text" />}><Columns3 className="size-3.5" />カラム</PopoverTrigger>
             <PopoverContent align="end" className="max-h-[70vh] w-72 overflow-y-auto p-2">
@@ -281,7 +309,7 @@ export default function DataPage() {
 
         <div className="overflow-x-auto rounded-xl border border-d-border">
           <table className="w-full min-w-max text-sm">
-            <thead className="bg-d-med/50 text-left text-xs text-d-text2"><tr>{cur.map((c) => <th key={c} className="px-3 py-2 font-medium whitespace-nowrap">{lbl(c)}</th>)}</tr></thead>
+            <thead className="bg-d-med/50 text-left text-xs text-d-text2"><tr>{cur.map((c) => <th key={c} className="p-0 font-medium whitespace-nowrap" aria-sort={sortCol === c ? (asc ? 'ascending' : 'descending') : 'none'}><button type="button" onClick={() => sortBy(c)} className={`flex w-full items-center gap-1 px-3 py-2 text-left hover:bg-d-med/60 ${sortCol === c ? 'text-d-text' : ''}`}>{lbl(c)}{sortCol === c && (asc ? <ArrowUpWideNarrow className="size-3" /> : <ArrowDownWideNarrow className="size-3" />)}</button></th>)}</tr></thead>
             <tbody className="divide-y divide-d-border">
               {loading && !res ? Array.from({ length: 8 }, (_, i) => <tr key={i}><td colSpan={Math.max(1, cur.length)} className="p-2"><Skeleton className="h-8" /></td></tr>)
                 : res?.rows.map((r, i) => (
