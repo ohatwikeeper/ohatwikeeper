@@ -2125,3 +2125,14 @@ article:focus, article:focus-visible, [tabindex="-1"]:focus, [tabindex="-1"]:foc
   outline: none !important;
   box-shadow: none !important;
 }
+
+/* サイト全体: キーボードフォーカスでも色付きのリング/アウトラインは出さない。入力欄だけ枠を少し濃くして位置が分かるようにする */
+*:focus-visible {
+  outline: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible,
+[data-slot="input"]:focus-visible, [data-slot="textarea"]:focus-visible {
+  border-color: color-mix(in oklab, currentColor 40%, transparent) !important;
+}
