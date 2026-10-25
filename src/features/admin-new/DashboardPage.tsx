@@ -1,67 +1,85 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bug, FlaskConical, Link2, Mail, MessageSquare, Notebook, Plug, RefreshCw, TriangleAlert, UserPlus, Users, LogIn, Activity, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, Bug, FlaskConical, Link2, LogIn, Mail, MessageSquare, Notebook, RefreshCw, TriangleAlert, UserPlus, Users, type LucideIcon } from 'lucide-react'
 import Shell from './Shell'
+import { Delta, Dot, Empty, PageHead, Panel, TONE_TEXT, rise, type Tone } from './ui'
 import { adminFetch, fmtDate, relTime } from '../admin/kit'
 import { Cell } from '../admin/data/cells'
 import { Sparkline } from '@/components/arc/sparkline/sparkline'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 
 type O = Record<string, number | null>
 type Trend = { days: string[]; signups: number[]; access: number[]; api: number[]; errors: number[] }
 type ListRes = { rows: Record<string, unknown>[]; total: number }
+type Row = Record<string, unknown>
 
-const SPARKS: [keyof Omit<Trend, 'days'>, string, 'accent' | 'success' | 'warning' | 'danger', string][] = [
-  ['access', 'アクセス', 'accent', '/admin-new/analytics?metric=access'], ['api', 'API呼び出し', 'success', '/admin-new/analytics?metric=api'],
-  ['signups', '新規登録', 'accent', '/admin-new/analytics?metric=signups'], ['errors', '画面エラー', 'danger', '/admin-new/analytics?metric=errors'],
-]
-const STATS: [string, string, string, LucideIcon, boolean?][] = [
-  ['users', 'ユーザー数', '/admin-new/data/users', Users], ['users_today', '今日の新規登録', '/admin-new/data/users', UserPlus], ['login_24h', '24時間のログイン', '/admin-new/data/users', LogIn],
-  ['records', '総おはツイ数', '', Notebook], ['api_errors_24h', '24時間のAPIエラー', '/admin-new/data/api-errors', TriangleAlert, true], ['errors_24h', '24時間の画面エラー', '/admin-new/data/page-errors', Bug, true],
-  ['mails_24h', '24時間のメール', '/admin-new/data/mails', Mail], ['feedbacks_open', '未対応フィードバック', '/admin-new/data/feedbacks', MessageSquare, true],
-  ['short_links', '短縮URL数', '/admin-new/data/short-links', Link2], ['beta_members', 'ベータ招待', '/admin/beta', FlaskConical],
+// 14 日推移。bad は「増えると悪い」指標
+const SPARKS: { k: keyof Omit<Trend, 'days'>; label: string; tone: 'accent' | 'success' | 'warning' | 'danger'; bad?: boolean }[] = [
+  { k: 'access', label: 'アクセス', tone: 'accent' }, { k: 'api', label: 'API呼び出し', tone: 'success' },
+  { k: 'signups', label: '新規登録', tone: 'accent' }, { k: 'errors', label: '画面エラー', tone: 'danger', bad: true },
 ]
 
-const pct = (a: number[]) => {
-  const t = a[a.length - 1] ?? 0, y = a[a.length - 2] ?? 0
-  if (!y) return t ? '+新規' : '±0%'
-  const d = Math.round(((t - y) / y) * 100)
-  return `${d >= 0 ? '+' : ''}${d}%`
-}
+// 主要指標(グループ別)。bad は 0 より大きいと要対応
+type Stat = { k: string; label: string; to: string; icon: LucideIcon; bad?: boolean }
+const GROUPS: { name: string; stats: Stat[] }[] = [
+  { name: 'ユーザー', stats: [
+    { k: 'users', label: 'ユーザー数', to: '/admin-new/data/users', icon: Users },
+    { k: 'users_today', label: '今日の新規登録', to: '/admin-new/data/users', icon: UserPlus },
+    { k: 'login_24h', label: '24時間のログイン', to: '/admin-new/data/users', icon: LogIn },
+    { k: 'beta_members', label: 'ベータ招待', to: '/admin/beta', icon: FlaskConical },
+  ] },
+  { name: '健全性', stats: [
+    { k: 'api_errors_24h', label: '24時間のAPIエラー', to: '/admin-new/data/api-errors', icon: TriangleAlert, bad: true },
+    { k: 'errors_24h', label: '24時間の画面エラー', to: '/admin-new/data/page-errors', icon: Bug, bad: true },
+    { k: 'feedbacks_open', label: '未対応フィードバック', to: '/admin-new/data/feedbacks', icon: MessageSquare, bad: true },
+    { k: 'mails_24h', label: '24時間のメール', to: '/admin-new/data/mails', icon: Mail },
+  ] },
+  { name: 'コンテンツ', stats: [
+    { k: 'records', label: '総おはツイ数', to: '', icon: Notebook },
+    { k: 'short_links', label: '短縮URL数', to: '/admin-new/data/short-links', icon: Link2 },
+  ] },
+]
+const ALL_STATS = GROUPS.flatMap((g) => g.stats)
 
-function RecentList({ title, to, rows, render }: { title: string; to: string; rows: Record<string, unknown>[] | null; render: (r: Record<string, unknown>) => React.ReactNode }) {
+const last = (a: number[], n = 0) => a[a.length - 1 - n] ?? 0
+
+function RecentList({ title, to, rows, render, i }: { title: string; to: string; rows: Row[] | null; render: (r: Row) => React.ReactNode; i: number }) {
   return (
-    <Card className="p-4">
-      <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-d-text">{title}</h2><Link to={to} className="text-xs !text-d-text2 hover:!text-d-text">すべて見る</Link></div>
-      {rows === null ? <div className="flex flex-col gap-2">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-9" />)}</div>
-        : rows.length === 0 ? <p className="py-6 text-center text-sm text-d-text3">データがありません</p>
-        : <ul className="divide-y divide-d-border">{rows.map((r, i) => <li key={i} className="py-2">{render(r)}</li>)}</ul>}
-    </Card>
+    <Panel i={i} title={title} flush action={<Link to={to} className="inline-flex min-h-8 items-center gap-0.5 text-xs !text-d-text3 hover:!text-d-text">すべて見る<ArrowUpRight className="size-3" /></Link>}>
+      {rows === null ? <div className="flex flex-col gap-2 px-3 pt-3 pb-2">{Array.from({ length: 5 }, (_, n) => <Skeleton key={n} className="h-9" />)}</div>
+        : rows.length === 0 ? <Empty>データがありません</Empty>
+        : <ul className="px-1.5 pt-1">{rows.map((r, n) => <li key={n}>{render(r)}</li>)}</ul>}
+    </Panel>
   )
 }
+
+const rowCls = 'flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 transition-colors hover:bg-d-light/60'
+const when = (r: Row) => <span className="shrink-0 text-xs tabular-nums text-d-text3" title={fmtDate(String(r.created_at))}>{relTime(String(r.created_at))}</span>
 
 export default function DashboardPage() {
   const [ov, setOv] = useState<O | null>(null)
   const [tr, setTr] = useState<Trend | null>(null)
-  const [errs, setErrs] = useState<Record<string, unknown>[] | null>(null)
-  const [users, setUsers] = useState<Record<string, unknown>[] | null>(null)
+  const [errs, setErrs] = useState<Row[] | null>(null)
+  const [users, setUsers] = useState<Row[] | null>(null)
+  const [perrs, setPerrs] = useState<Row[] | null>(null)
   const [auto, setAuto] = useState(true)
   const [at, setAt] = useState<Date | null>(null)
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
     setBusy(true)
-    const [o, t, e, u] = await Promise.all([
+    const [o, t, e, u, p] = await Promise.all([
       adminFetch<O>('data/_overview').catch(() => null), adminFetch<Trend>('data/_trend').catch(() => null),
       adminFetch<ListRes>('data/api-errors?page=1').catch(() => null), adminFetch<ListRes>('data/users?page=1').catch(() => null),
+      adminFetch<ListRes>('data/page-errors?page=1').catch(() => null),
     ])
     if (o) setOv(o)
     if (t) setTr(t)
-    setErrs(e ? e.rows.slice(0, 7) : [])
-    setUsers(u ? u.rows.slice(0, 7) : [])
+    setErrs(e ? e.rows.slice(0, 6) : [])
+    setUsers(u ? u.rows.slice(0, 6) : [])
+    setPerrs(p ? p.rows.slice(0, 6) : [])
     setAt(new Date()); setBusy(false)
   }, [])
   useEffect(() => { load() }, [load])
@@ -71,69 +89,90 @@ export default function DashboardPage() {
     return () => clearInterval(h)
   }, [auto, load])
 
-  const alerts = STATS.filter(([k, , , , bad]) => bad && (ov?.[k] ?? 0) > 0)
+  const alerts = ALL_STATS.filter((s) => s.bad && (ov?.[s.k] ?? 0) > 0)
+  const status: { tone: Tone; text: string } = ov === null ? { tone: 'neutral', text: '集計を読み込み中' }
+    : alerts.length ? { tone: 'danger', text: `要確認が ${alerts.length} 件あります` } : { tone: 'success', text: '異常はありません' }
 
   return (
     <Shell title="ダッシュボード" actions={
       <>
-        <label className="hidden items-center gap-2 text-xs text-d-text2 sm:flex"><Switch checked={auto} onCheckedChange={setAuto} />30秒ごとに自動更新</label>
-        <Button variant="outline" size="icon-sm" aria-label="更新" onClick={load} disabled={busy}><RefreshCw className={busy ? 'animate-spin' : ''} /></Button>
+        <label className="hidden min-h-9 items-center gap-2 text-xs text-d-text2 sm:flex"><Switch checked={auto} onCheckedChange={setAuto} />30秒ごとに自動更新</label>
+        <Button variant="ghost" size="icon" aria-label="更新" onClick={load} disabled={busy}><RefreshCw className={busy ? 'animate-spin' : ''} /></Button>
       </>
     }>
-      <div className="flex flex-col gap-6">
+      <PageHead title="ダッシュボード" desc={
+        <span className="inline-flex items-center gap-2"><Dot tone={status.tone} pulse={status.tone === 'danger'} />{status.text}
+          <span className="text-d-text3">・ 最終更新 <span className="tabular-nums">{at ? at.toLocaleTimeString('ja-JP') : '-'}</span></span></span>
+      } />
+
+      <div className="flex flex-col gap-4">
         {alerts.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {alerts.map(([k, label, to, Icon]) => (
-              <Link key={k} to={to} className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm !text-d-text">
-                <Icon className="size-4 text-red-400" />{label}<b className="tabular-nums text-red-400">{(ov?.[k] ?? 0).toLocaleString()}</b>
+          <div style={rise(0)} className="an-rise flex flex-wrap gap-2" role="status">
+            {alerts.map((s) => (
+              <Link key={s.k} to={s.to} className="an-press inline-flex min-h-10 items-center gap-2 rounded-xl bg-d-danger/10 px-3.5 text-sm !text-d-text shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--d-danger)_35%,transparent)] hover:bg-d-danger/15">
+                <s.icon className="size-4 text-d-danger" />{s.label}<b className="font-medium tabular-nums text-d-danger">{(ov?.[s.k] ?? 0).toLocaleString()}</b>
               </Link>
             ))}
           </div>
         )}
 
-        <section aria-label="14日間の推移" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {SPARKS.map(([k, label, tone, to]) => (
-            <Card key={k} className="p-4">
+        <section aria-label="14日間の推移" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {SPARKS.map((s, n) => (
+            <Panel key={s.k} i={n + 1} className="transition-transform hover:-translate-y-0.5">
               {tr ? (
-                <Link to={to} className="block !text-d-text">
-                  <Sparkline data={tr[k]} labels={tr.days.map((d) => d.slice(5))} label={label} value={(tr[k][tr[k].length - 1] ?? 0).toLocaleString()} change={pct(tr[k])} tone={tone} width={260} height={64} />
-                  <p className="mt-1 text-xs text-d-text3">今日 / 14日合計 {tr[k].reduce((a, b) => a + b, 0).toLocaleString()}</p>
+                <Link to={`/admin-new/analytics?metric=${s.k}`} className="block !text-d-text">
+                  <Sparkline data={tr[s.k]} labels={tr.days.map((d) => d.slice(5))} label={s.label} value={last(tr[s.k]).toLocaleString()} change={undefined} tone={s.tone} width={260} height={64} />
+                  <p className="mt-2 flex items-center justify-between text-xs text-d-text3">
+                    <span>14日合計 <span className="tabular-nums text-d-text2">{tr[s.k].reduce((a, b) => a + b, 0).toLocaleString()}</span></span>
+                    <Delta now={last(tr[s.k])} prev={last(tr[s.k], 1)} good={s.bad ? 'down' : 'up'} />
+                  </p>
                 </Link>
               ) : <Skeleton className="h-28" />}
-            </Card>
+            </Panel>
           ))}
         </section>
 
-        <section aria-label="主要指標" className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {STATS.map(([k, label, to, Icon, bad]) => {
-            const v = ov?.[k]
-            const body = (
-              <Card className="h-full p-3.5 transition-colors hover:bg-d-med/50">
-                <div className="flex items-center gap-1.5 text-xs text-d-text2"><Icon className="size-3.5" />{label}</div>
-                <div className={`mt-1.5 text-2xl font-semibold tabular-nums ${bad && (v ?? 0) > 0 ? 'text-red-400' : 'text-d-text'}`}>
-                  {ov === null ? <Skeleton className="h-8 w-16" /> : v === null || v === undefined ? '-' : v.toLocaleString()}
-                </div>
-              </Card>
-            )
-            return to ? <Link key={k} to={to}>{body}</Link> : <div key={k}>{body}</div>
-          })}
+        <section aria-label="主要指標" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {GROUPS.map((g, gi) => (
+            <Panel key={g.name} i={gi + 5} title={g.name} flush>
+              <dl className="px-1.5 pt-1">
+                {g.stats.map((s) => {
+                  const v = ov?.[s.k]
+                  const hot = s.bad && (v ?? 0) > 0
+                  const body = (
+                    <>
+                      <dt className="flex min-w-0 items-center gap-2 text-[13px] text-d-text2"><s.icon className="size-4 shrink-0 text-d-text3" strokeWidth={1.75} /><span className="truncate">{s.label}</span></dt>
+                      <dd className={`text-lg font-medium tabular-nums ${hot ? TONE_TEXT.danger : 'text-d-text'}`}>
+                        {ov === null ? <Skeleton className="h-6 w-14" /> : v === null || v === undefined ? '-' : v.toLocaleString()}
+                      </dd>
+                    </>
+                  )
+                  return s.to
+                    ? <Link key={s.k} to={s.to} className={`${rowCls} justify-between !text-d-text`}>{body}</Link>
+                    : <div key={s.k} className={`${rowCls} justify-between hover:bg-transparent`}>{body}</div>
+                })}
+              </dl>
+            </Panel>
+          ))}
         </section>
 
-        <section className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <RecentList title="最近のAPIエラー" to="/admin-new/data/api-errors" rows={errs} render={(r) => (
-            <Link to={`/admin-new/data/api-errors?q=${encodeURIComponent(String(r.request_id ?? ''))}`} className="flex items-center gap-2 !text-d-text">
-              <Cell col="status" value={r.status} /><span className="min-w-0 flex-1 truncate text-sm">{String(r.message ?? r.request_uri ?? '-')}</span>
-              <span className="shrink-0 text-xs text-d-text3" title={fmtDate(String(r.created_at))}>{relTime(String(r.created_at))}</span>
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <RecentList i={8} title="最近のAPIエラー" to="/admin-new/data/api-errors" rows={errs} render={(r) => (
+            <Link to={`/admin-new/data/api-errors?q=${encodeURIComponent(String(r.request_id ?? ''))}`} className={`${rowCls} !text-d-text`}>
+              <Cell col="status" value={r.status} /><span className="min-w-0 flex-1 truncate text-sm">{String(r.message ?? r.request_uri ?? '-')}</span>{when(r)}
             </Link>
           )} />
-          <RecentList title="最近の登録ユーザー" to="/admin-new/data/users" rows={users} render={(r) => (
-            <div className="flex items-center gap-2.5">
-              <Cell col="x_icon" value={r.x_icon} /><span className="min-w-0 flex-1 truncate text-sm text-d-text">{String(r.x_username ?? r.id)}</span>
-              <span className="shrink-0 text-xs text-d-text3" title={fmtDate(String(r.created_at))}>{relTime(String(r.created_at))}</span>
-            </div>
+          <RecentList i={9} title="最近の画面エラー" to="/admin-new/data/page-errors" rows={perrs} render={(r) => (
+            <Link to={`/admin-new/data/page-errors?q=${encodeURIComponent(String(r.message ?? r.id ?? ''))}`} className={`${rowCls} !text-d-text`}>
+              <Bug className="size-4 shrink-0 text-d-danger" strokeWidth={1.75} /><span className="min-w-0 flex-1 truncate text-sm">{String(r.message ?? r.url ?? r.path ?? '-')}</span>{when(r)}
+            </Link>
+          )} />
+          <RecentList i={10} title="最近の登録ユーザー" to="/admin-new/data/users" rows={users} render={(r) => (
+            <Link to={`/admin-new/data/users?q=${encodeURIComponent(String(r.x_username ?? r.id))}`} className={`${rowCls} !text-d-text`}>
+              <Cell col="x_icon" value={r.x_icon} /><span className="min-w-0 flex-1 truncate text-sm">{String(r.x_username ?? r.id)}</span>{when(r)}
+            </Link>
           )} />
         </section>
-        <p className="flex items-center gap-1.5 text-xs text-d-text3"><Activity className="size-3" />最終更新 {at ? at.toLocaleTimeString('ja-JP') : '-'}<Plug className="ml-2 size-3" />データは旧管理画面と共通です</p>
       </div>
     </Shell>
   )

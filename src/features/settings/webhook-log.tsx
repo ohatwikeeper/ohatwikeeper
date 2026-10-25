@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import FacetedFilterBar from '@/components/dashboard-ui/FacetedFilterBar'
 import { PageLoader } from '@/components/ui/page-loader'
 import { Webhook } from 'lucide-react'
+import { Reveal } from './motion'
 import PageHeader from '@/components/dashboard-ui/PageHeader'
 import { useEffect, useState } from 'react'
 import { friendlyError } from '@/lib/dashboard/api'
@@ -73,16 +74,16 @@ export default function WebhookLogPage() {
                     <span className="min-w-0 flex-1 truncate">{l.event}</span>
                     <span className="shrink-0 text-xs text-d-text3">{l.duration_ms != null ? `${l.duration_ms}ms` : ''}</span>
                     <span className="shrink-0 text-xs text-d-text3">{l.triggered_at?.slice(0, 19)}</span>
-                    <i className={`bx bx-chevron-down shrink-0 text-d-text3 transition-transform ${open === l.id ? 'rotate-180' : ''}`} />
+                    <i className={`bx bx-chevron-down shrink-0 text-d-text3 transition-transform duration-200 ${open === l.id ? 'rotate-180' : ''}`} />
                   </button>
-                  {open === l.id && (
+                  <Reveal show={open === l.id}>
                     <div className="grid gap-3 pb-4 md:grid-cols-2">
                       {[['wl.req', l.payload], ['wl.res', l.response_body]].map(([tl, b]) => (
                         <div key={tl as string}><div className="mb-1 text-[11px] uppercase tracking-wider text-d-text3">{t(tl as string)}</div>
                           <pre className="max-h-64 overflow-auto rounded-lg border border-d-border bg-d-med p-3 text-xs">{pretty(b as string | null) || t('wl.nothing')}</pre></div>
                       ))}
                     </div>
-                  )}
+                  </Reveal>
                 </li>
               ))}
             </ul>

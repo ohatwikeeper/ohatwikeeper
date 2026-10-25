@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useListItem } from './motion'
 import { useTranslation } from 'react-i18next'
 import { ShieldCheck, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,6 +21,7 @@ const label = (ua: string | null, unknown: string) => {
 const fmt = (ms: number | string) => new Date(Number(ms)).toLocaleString()
 
 export default function SecuritySection() {
+  const item = useListItem()
   const { t } = useTranslation()
   const [sessions, setSessions] = useState<Sess[]>([])
   const [history, setHistory] = useState<Hist[]>([])
@@ -49,8 +52,8 @@ export default function SecuritySection() {
 
       <h3 className="text-sm font-bold text-d-text mt-4">{t('sec.devices')}</h3>
       <ul className="mt-2 divide-y divide-d-border rounded-lg border border-d-border">
-        {sessions.map((s) => (
-          <li key={s.id} className="flex items-center gap-3 p-3">
+        <AnimatePresence initial={false}>{sessions.map((s) => (
+          <motion.li key={s.id} {...item} className="flex items-center gap-3 p-3">
             <Monitor className="w-4 h-4 shrink-0 text-d-text3" />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-d-text truncate">
@@ -62,8 +65,8 @@ export default function SecuritySection() {
             {!s.current && (
               <Button variant="outline" size="sm" disabled={busy} className="border-d-border" onClick={() => run(() => apiSend(`security/sessions/${s.id}`, 'DELETE'))}>{t('sec.logout')}</Button>
             )}
-          </li>
-        ))}
+          </motion.li>
+        ))}</AnimatePresence>
       </ul>
       {others > 0 && (
         <Button variant="outline" size="sm" disabled={busy} className="mt-3 border-d-border"

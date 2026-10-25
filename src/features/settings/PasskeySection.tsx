@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useListItem } from './motion'
 import { useTranslation } from 'react-i18next'
 import { KeyRound, Pencil, Trash2 } from 'lucide-react'
 import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -11,6 +13,7 @@ import { apiGet, apiSend, friendlyError } from '@/lib/dashboard/api'
 type Pk = { id: number; name: string; created_at: number; last_used_at: number | null }
 
 export default function PasskeySection() {
+  const item = useListItem()
   const { t } = useTranslation()
   const [list, setList] = useState<Pk[]>([])
   const [busy, setBusy] = useState(false)
@@ -48,8 +51,8 @@ export default function PasskeySection() {
 
       {list.length === 0 ? <p className="text-xs text-d-text3 mt-3">{t('pk.none')}</p> : (
         <ul className="mt-3 divide-y divide-d-border rounded-lg border border-d-border">
-          {list.map((p) => (
-            <li key={p.id} className="flex items-center gap-3 p-3">
+          <AnimatePresence initial={false}>{list.map((p) => (
+            <motion.li key={p.id} {...item} className="flex items-center gap-3 p-3">
               <div className="min-w-0 flex-1">
                 {editing?.id === p.id ? (
                   <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); void act(() => apiSend(`passkeys/${p.id}`, 'PATCH', { name: editing.name }), t('pk.saved')).then(() => setEditing(null)) }}>
@@ -66,8 +69,8 @@ export default function PasskeySection() {
               <Button variant="ghost" size="icon" aria-label={t('pk.rename')} disabled={busy} onClick={() => setEditing({ id: p.id, name: p.name })}><Pencil className="w-4 h-4" /></Button>
               <Button variant="ghost" size="icon" aria-label={t('pk.delete')} disabled={busy}
                 onClick={async () => { if (await confirmDialog({ title: t('pk.deleteQ'), confirmLabel: t('pk.delete'), destructive: true })) await act(() => apiSend(`passkeys/${p.id}`, 'DELETE')) }}><Trash2 className="w-4 h-4" /></Button>
-            </li>
-          ))}
+            </motion.li>
+          ))}</AnimatePresence>
         </ul>
       )}
 

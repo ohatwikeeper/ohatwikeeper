@@ -10,7 +10,7 @@ import { ImageModal } from '@/features/records/Modals'
 import RecordsSection from '@/features/records/RecordsSection'
 import type { RecordItem } from '@/lib/dashboard/types'
 import PageHeader from '@/components/dashboard-ui/PageHeader'
-import { Spinner } from '@/components/ui/spinner'
+import { PageLoader } from '@/components/ui/page-loader'
 import { MetricCard } from '@/components/arc/metric-card/metric-card'
 
 interface RecapData {
@@ -120,10 +120,7 @@ export default function RecapPage() {
         } />
 
         {loading ? (
-          <div className="py-20 text-center text-d-text3">
-            <Spinner className="mb-3" />
-            <p>{tr('rcp.loading')}</p>
-          </div>
+          <PageLoader />
         ) : error ? (
           <div className="bg-d-med border border-red-500/30 text-red-400 p-6 rounded-xl text-center">
             <p className="font-bold">{error}</p>

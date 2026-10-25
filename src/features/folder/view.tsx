@@ -5,7 +5,7 @@ import PageHeader from '@/components/dashboard-ui/PageHeader'
 import { friendlyError } from '@/lib/dashboard/api'
 import { useParams } from 'react-router-dom'
 import { CONFIG } from '@/lib/config'
-import { Spinner } from '@/components/ui/spinner'
+import { PageLoader } from '@/components/ui/page-loader'
 import { useSetCrumbLabel } from '@/app/layouts/crumbStore'
 
 interface FolderRecord {
@@ -76,10 +76,7 @@ export default function FolderViewPage() {
     <div className="dash-scope text-d-text">
       <div className="max-w-5xl mx-auto px-5 py-10">
         {loading ? (
-          <div className="py-20 text-center text-d-text3">
-            <Spinner className="mb-3" />
-            <p>{t('fd.loading')}</p>
-          </div>
+          <PageLoader />
         ) : error ? (
           <div className="bg-d-med border border-red-500/30 text-red-400 p-6 rounded-xl text-center">
             <p className="font-bold">{error}</p>

@@ -4,7 +4,7 @@ import { friendlyError } from '@/lib/dashboard/api'
 import { useParams, Link } from 'react-router-dom'
 import { CONFIG } from '@/lib/config'
 import TweetEmbed from '@/features/records/TweetEmbed'
-import { Spinner } from '@/components/ui/spinner'
+import { PageLoader } from '@/components/ui/page-loader'
 
 interface RecordDetailsData {
   record: {
@@ -77,10 +77,7 @@ export default function DetailsPage() {
     <div className="dash-scope min-h-screen bg-d-bg text-d-text">
       <div className="mx-auto max-w-4xl px-5 py-8">
         {loading ? (
-          <div className="py-24 text-center text-d-text3">
-            <Spinner className="mb-3" />
-            <p>{tr('dt.loading')}</p>
-          </div>
+          <PageLoader />
         ) : error ? (
           <div className="rounded-xl border border-d-danger/30 bg-d-med p-6 text-center">
             <p className="font-bold text-d-danger">{error}</p>

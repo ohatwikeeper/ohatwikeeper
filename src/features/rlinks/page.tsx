@@ -10,7 +10,6 @@ import { SimpleSelect } from '@/components/ui/simple-select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Spinner } from '@/components/ui/spinner'
 import PageHeader from '@/components/dashboard-ui/PageHeader'
 import { PageLoader } from '@/components/ui/page-loader'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -328,10 +327,7 @@ export default function RLinksPage() {
 
         {/* Links List */}
         {loading ? (
-          <div className="text-center py-20 text-d-text3">
-            <Spinner className="mb-3" />
-            <PageLoader />
-          </div>
+          <PageLoader />
         ) : error ? (
           <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-center">
             <p className="font-semibold">{error}</p>
@@ -1072,10 +1068,7 @@ function AccessLogsModal({ link, onClose }: { link: ShortLink; onClose: () => vo
         {/* Logs Table */}
         <div className="flex-1 overflow-auto p-4">
           {loading ? (
-            <div className="text-center py-16 text-d-text3">
-              <Spinner className="mb-2" />
-              <PageLoader />
-            </div>
+            <PageLoader />
           ) : logs.length === 0 ? (
             <div className="text-center py-16 text-d-text3 text-sm">
               {t('rl.noLogs')}

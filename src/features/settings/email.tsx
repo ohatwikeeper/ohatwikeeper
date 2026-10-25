@@ -6,6 +6,7 @@ import { toast } from '@/lib/toast'
 import { CheckCircle2, MailPlus, RotateCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Reveal } from './motion'
 import { OtpField } from '@/components/ui/otp-field'
 
 type Res = { ok: boolean; message?: string; email?: string; pending?: string | null; resend_after?: number; expires_in?: number }
@@ -70,7 +71,7 @@ export function EmailChange({ onDone }: { onDone?: () => void }) {
       <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${adding ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`} aria-hidden={!adding}>
         <div className="-mx-1 min-h-0 overflow-hidden px-1">
         <div className={`space-y-3 pb-1 pt-1 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${adding ? 'translate-y-0' : '-translate-y-2'}`}>
-        {error && <div className="mb-4 rounded-lg border border-d-danger/40 bg-d-danger/10 px-3 py-2 text-sm text-d-danger">{error}</div>}
+        <Reveal show={!!error}><div className="mb-4 rounded-lg border border-d-danger/40 bg-d-danger/10 px-3 py-2 text-sm text-d-danger">{error}</div></Reveal>
 
         {!pending ? (
           <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); run({ action: 'request_change', new_email: email }, (d) => { setPending(d.email ?? email); setWait(d.resend_after ?? 60); setExp(Date.now() + 600000); toast.success(d.message) }) }}>

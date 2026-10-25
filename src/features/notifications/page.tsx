@@ -17,7 +17,6 @@ import {
   Inbox,
 } from 'lucide-react'
 import { apiGet, apiSend } from '@/lib/dashboard/api'
-import { Spinner } from '@/components/ui/spinner'
 
 interface Cta {
   label: string
@@ -138,7 +137,7 @@ export default function NotificationsPage() {
         </Tabs>
 
         {loading ? (
-          <div className="py-20 text-center text-d-text3"><Spinner className="mb-3" /><PageLoader /></div>
+          <PageLoader />
         ) : displayedList.length === 0 ? (
           <div className="py-16 text-center">
             <Inbox className="mx-auto mb-3 size-10 text-d-text3" />

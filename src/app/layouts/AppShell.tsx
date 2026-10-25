@@ -2,7 +2,7 @@ import SetupBanner from '@/features/onboard/SetupBanner'
 import { SetupLock } from '@/features/onboard/OnboardGate'
 import { useTranslation } from 'react-i18next'
 import { Children, createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useOutlet, useLocation } from 'react-router-dom'
 import { PanelLeft } from 'lucide-react'
 import { motion } from 'motion/react'
 import Breadcrumbs from './Breadcrumbs'
@@ -11,14 +11,46 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 const SlotCtx = createContext<((n: ReactNode) => void) | null>(null)
 
+const PAGE_OUT_MS = 160
+
 /**
  * サイドメニューのある全ページ共通の外枠。サイドバーの枠・スクロール領域はページ間移動でも作り直さず、
  * 各レイアウトが SidebarSlot でサイドバーの中身だけを差し込む(リロード感なし)。
  */
+/** ページ切り替え演出の単位。設定画面のタブ(/settings/notify など)は同じページとして扱い、作り直さない */
+const pageKeyOf = (p: string) => (/^\/settings(\.php|_api)?(\/[^/]+)?\/?$/.test(p) ? '/settings' : p)
+
 export default function AppShell() {
   const { t: tr } = useTranslation()
   const { pathname, hash } = useLocation()
+  const pageKey = pageKeyOf(pathname)
   const [side, setSide] = useState<ReactNode>(null)
+  // ページ移動: 前のページをブラーで消してから、新しいページをブラーで表示する
+  const outlet = useOutlet()
+  const [shownKey, setShownKey] = useState(pageKey)
+  const frozen = useRef(outlet)
+  if (shownKey === pageKey) frozen.current = outlet
+  const leaving = shownKey !== pageKey
+  const pageRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (shownKey === pageKey) return
+    const t = setTimeout(() => setShownKey(pageKey), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : PAGE_OUT_MS)
+    return () => clearTimeout(t)
+  }, [pageKey, shownKey])
+  // ローディング表示が出ている間はブラーを保留し、消えた時点で表示アニメーションを始める
+  useLayoutEffect(() => {
+    const el = pageRef.current
+    if (!el || leaving || !el.querySelector('[data-page-loader]')) return
+    el.classList.add('is-loading')
+    const done = () => queueMicrotask(() => {
+      if (el.querySelector('[data-page-loader]')) return
+      el.classList.remove('is-loading')
+      void el.offsetWidth
+      window.removeEventListener('ohax:page-loader-gone', done)
+    })
+    window.addEventListener('ohax:page-loader-gone', done)
+    return () => window.removeEventListener('ohax:page-loader-gone', done)
+  }, [shownKey, leaving])
   // ページ移動で新しく現れる項目は、先にスケルトンを出して少し後に中身へ置き換える(レイアウトがガクつかないように)
   // サイドメニューの開閉(PC幅のみ)。選択は端末に保存
   const [open, setOpen] = useState(() => { try { return localStorage.getItem('ohax_side_open') !== '0' } catch { return true } })
@@ -33,7 +65,7 @@ export default function AppShell() {
     if (hash) return
     mainRef.current?.scrollTo(0, 0)
     shellRef.current?.scrollTo(0, 0)
-  }, [pathname, hash])
+  }, [pageKey, hash])
 
   return (
     <TooltipProvider>
@@ -63,7 +95,7 @@ export default function AppShell() {
               <ScrollArea fade={0} className="min-h-0 flex-1" viewportClassName="pb-8 lg:pr-3" viewportRef={mainRef}>
                 <SlotCtx.Provider value={setSide}>
                   <SetupBanner />
-                  <Outlet />
+                  <div key={shownKey} ref={pageRef} className={leaving ? 'page-blur-out' : 'page-blur-in'}>{leaving ? frozen.current : outlet}</div>
                 </SlotCtx.Provider>
               </ScrollArea>
             <SetupLock />

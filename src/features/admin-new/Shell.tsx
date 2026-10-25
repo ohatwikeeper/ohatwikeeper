@@ -6,24 +6,30 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { ALL_ITEMS, NAV } from './nav'
+import { Kbd } from './ui'
 
 type Access = 'checking' | 'ok' | 'login' | 'forbidden'
+
+const isActive = (pathname: string, to: string) => pathname === to
 
 function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const { pathname } = useLocation()
   return (
-    <nav className="flex flex-col gap-5">
+    <nav aria-label="管理メニュー" className="flex flex-col gap-6">
       {NAV.map((g) => (
         <div key={g.group}>
-          {!collapsed && <p className="mb-1.5 px-2.5 text-xs font-medium text-d-text3">{g.group}</p>}
+          {!collapsed
+            ? <p className="mb-1.5 px-3 text-[11px] text-d-text3">{g.group}</p>
+            : <div className="mx-3 mb-2 h-px bg-d-border" />}
           <ul className="flex flex-col gap-0.5">
             {g.items.map((n) => {
-              const active = pathname === n.to
+              const active = isActive(pathname, n.to)
               return (
                 <li key={n.to}>
                   <Link to={n.legacy ? n.legacy : n.to} onClick={onNavigate} title={n.label} aria-current={active ? 'page' : undefined}
-                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${collapsed ? 'justify-center' : ''} ${active ? 'bg-d-accent/15 !text-d-text' : '!text-d-text2 hover:bg-d-med/70'}`}>
-                    <n.icon className={`size-4 shrink-0 ${active ? 'text-d-accent' : ''}`} />
+                    className={`an-press group relative flex min-h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] ${collapsed ? 'justify-center px-0' : ''} ${active ? 'bg-d-light !text-d-text' : '!text-d-text2 hover:bg-d-light/60 hover:!text-d-text'}`}>
+                    {active && <span aria-hidden className="absolute top-2 bottom-2 -left-2 w-0.5 rounded-full bg-d-accent" />}
+                    <n.icon className={`size-4 shrink-0 transition-colors ${active ? 'text-d-accent' : 'text-d-text3 group-hover:text-d-text2'}`} strokeWidth={1.75} />
                     {!collapsed && <span className="truncate">{n.label}</span>}
                     {!collapsed && n.legacy && <ExternalLink className="ml-auto size-3 text-d-text3" />}
                   </Link>
@@ -69,6 +75,15 @@ function Palette({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => vo
   )
 }
 
+function Brand({ collapsed }: { collapsed?: boolean }) {
+  return (
+    <Link to="/admin-new" aria-label="ダッシュボードへ" className="flex min-w-0 items-center gap-2.5 !text-d-text">
+      <span aria-hidden className="grid size-7 shrink-0 place-items-center rounded-lg bg-d-accent text-[13px] font-medium text-d-accent-fg">お</span>
+      {!collapsed && <span className="truncate text-sm font-medium">おはツイKeeper<span className="ml-1.5 text-xs text-d-text3">管理</span></span>}
+    </Link>
+  )
+}
+
 /** /admin-new 共通シェル。管理者(サーバー側判定)以外には中身を出さない */
 export default function Shell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   const { pathname } = useLocation()
@@ -90,48 +105,53 @@ export default function Shell({ title, actions, children }: { title: string; act
   }, [])
   const toggle = () => setCollapsed((v) => { localStorage.setItem('admin-new:collapsed', v ? '0' : '1'); return !v })
 
-  if (access === 'checking') return <div className="dash-scope min-h-screen" />
+  if (access === 'checking') return <div className="dash-scope min-h-screen bg-d-bg" />
   if (access === 'login') return <div className="dash-scope min-h-screen bg-d-bg text-d-text"><LoginRequired message="管理画面を表示するにはログインが必要です。" /></div>
   if (access !== 'ok') {
     return (
       <div className="dash-scope min-h-screen bg-d-bg text-d-text"><div className="mx-auto max-w-md px-5 py-28 text-center">
-        <div className="text-6xl font-extrabold text-d-text3">403</div>
+        <div className="text-6xl font-medium tabular-nums text-d-text3">403</div>
         <p className="mt-4 text-d-text2">このページを表示する権限がありません。</p>
         <Link to="/" className="mt-6 inline-block text-sm text-d-text2 hover:text-d-text">トップへ戻る</Link>
       </div></div>
     )
   }
   return (
-    <div className="dash-scope min-h-screen bg-d-bg text-d-text">
-      <aside className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-d-border bg-d-bg py-4 transition-[width] lg:flex ${collapsed ? 'w-16 px-2' : 'w-60 px-3'}`}>
-        <div className={`mb-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between px-2'}`}>
-          {!collapsed && <Link to="/admin-new" className="text-sm font-bold !text-d-text">おはツイKeeper 管理</Link>}
+    <div className="dash-scope min-h-screen bg-d-bg text-d-text antialiased">
+      <aside className={`fixed inset-y-0 left-0 z-30 hidden flex-col bg-d-med/60 py-4 shadow-[1px_0_0_rgb(255_255_255/.06)] backdrop-blur transition-[width] duration-200 lg:flex ${collapsed ? 'w-16 px-2' : 'w-64 px-3'}`}>
+        <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-3' : 'justify-between px-1'}`}>
+          <Brand collapsed={collapsed} />
           <Button variant="ghost" size="icon-sm" aria-label="サイドバーの開閉" onClick={toggle}>{collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</Button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto"><NavList collapsed={collapsed} /></div>
-        {!collapsed && <Link to="/admin" className="mt-3 px-2.5 text-xs !text-d-text3">旧管理画面へ</Link>}
+        <button type="button" onClick={() => setPalette(true)} aria-label="検索・移動"
+          className={`an-press mb-5 flex h-9 items-center gap-2 rounded-lg bg-d-light/60 text-xs text-d-text3 shadow-[inset_0_0_0_1px_rgb(255_255_255/.06)] hover:bg-d-light hover:text-d-text2 ${collapsed ? 'justify-center' : 'px-3'}`}>
+          <Search className="size-3.5" />{!collapsed && <><span>検索・移動</span><span className="ml-auto"><Kbd>⌘K</Kbd></span></>}
+        </button>
+        <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1 pb-2"><NavList collapsed={collapsed} /></div>
+        {!collapsed && <Link to="/admin" className="mt-3 flex items-center gap-1.5 px-3 text-xs !text-d-text3 hover:!text-d-text2">旧管理画面へ<ExternalLink className="size-3" /></Link>}
       </aside>
+
       <Sheet open={mobile} onOpenChange={setMobile}>
-        <SheetContent side="left" className="w-64 overflow-y-auto p-4">
-          <SheetTitle className="mb-4 text-sm">管理メニュー</SheetTitle>
+        <SheetContent side="left" className="w-72 overflow-y-auto p-4">
+          <SheetTitle className="mb-5"><Brand /></SheetTitle>
           <NavList onNavigate={() => setMobile(false)} />
         </SheetContent>
       </Sheet>
-      <div className={`transition-[padding] ${collapsed ? 'lg:pl-16' : 'lg:pl-60'}`}>
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-d-border bg-d-bg/85 px-4 backdrop-blur">
-          <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label="メニュー" onClick={() => setMobile(true)}><Menu /></Button>
-          <div className="flex min-w-0 items-center gap-1.5 text-sm text-d-text2">
-            {group && <><span className="hidden sm:inline">{group}</span><ChevronRight className="hidden size-3.5 sm:inline" /></>}
-            <span className="truncate font-semibold text-d-text">{title}</span>
-          </div>
+
+      <div className={`transition-[padding] duration-200 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
+        <header className="sticky top-0 z-20 flex h-12 items-center gap-2 bg-d-bg/80 px-4 shadow-[0_1px_0_rgb(255_255_255/.05)] backdrop-blur-md sm:px-6">
+          <Button variant="ghost" size="icon" className="-ml-2 lg:hidden" aria-label="メニュー" onClick={() => setMobile(true)}><Menu /></Button>
+          <nav aria-label="パンくず" className="flex min-w-0 items-center gap-1.5 text-xs text-d-text3">
+            <Link to="/admin-new" className="hidden !text-d-text3 hover:!text-d-text2 sm:inline">管理</Link>
+            {group && <><ChevronRight className="hidden size-3 sm:inline" /><span className="hidden sm:inline">{group}</span></>}
+            <ChevronRight className="hidden size-3 sm:inline" /><span className="truncate text-d-text2">{title}</span>
+          </nav>
           <div className="ml-auto flex items-center gap-2">
             {actions}
-            <Button variant="outline" size="sm" onClick={() => setPalette(true)} className="!text-d-text2">
-              <Search className="size-3.5" /><span className="hidden sm:inline">検索・移動</span><kbd className="hidden rounded border border-d-border px-1 text-[10px] sm:inline">⌘K</kbd>
-            </Button>
+            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="検索・移動" onClick={() => setPalette(true)}><Search /></Button>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1500px] p-4 sm:p-6">{children}</main>
+        <main className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       </div>
       <Palette open={palette} setOpen={setPalette} />
     </div>

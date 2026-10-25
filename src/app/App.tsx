@@ -65,6 +65,7 @@ const DiffPage = lazy(() => import('@/features/diff/page'))
 const DetailsPage = lazy(() => import('@/features/details/page'))
 const SurveyResultPage = lazy(() => import('@/features/survey/result'))
 const WebhookLogPage = lazy(() => import('@/features/settings/webhook-log'))
+const ApiUsagePage = lazy(() => import('@/features/settings/api-usage'))
 const SurveyListPage = lazy(() => import('@/features/survey/list'))
 const SurveyPage = lazy(() => import('@/features/survey/page'))
 const ToolsPage = lazy(() => import('@/features/tools/page'))
@@ -117,9 +118,9 @@ function App() {
             <Route path="/folder.php" element={<Suspense fallback={<PageLoader />}><FolderPage /></Suspense>} />
             <Route path="/recap" element={<RedirectToOwn suffix="recap" />} />
             <Route path="/recap.php" element={<RedirectToOwn suffix="recap" />} />
-            <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
             <Route path="/settings.php" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
-            <Route path="/settings/:tab" element={<SettingsTabRoute />} />
+            <Route path="/settings/:tab?" element={<SettingsTabRoute />} />
+            <Route path="/settings/apikey/usage" element={<Suspense fallback={<PageLoader />}><ApiUsagePage /></Suspense>} />
             <Route path="/settings/webhook/:id" element={<Suspense fallback={<PageLoader />}><WebhookLogPage /></Suspense>} />
             <Route path="/settings/webhook/:id/log" element={<Suspense fallback={<PageLoader />}><WebhookLogPage /></Suspense>} />
             <Route path="/settings_api" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />

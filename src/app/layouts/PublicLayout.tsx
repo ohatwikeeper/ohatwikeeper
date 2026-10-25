@@ -21,7 +21,7 @@ interface ProfileData {
 }
 
 const Centered = ({ icon, text }: { icon: string; text: string }) => (
-  <div className="dash-scope dash-shell grid place-items-center px-4 text-center">
+  <div className="grid min-h-[60vh] place-items-center px-4 py-10 text-center">
     <div className="max-w-md rounded-2xl border border-d-border bg-d-med p-8">
       <i className={`bx ${icon} mb-3 text-4xl text-d-text3`} />
       <p className="text-d-text2">{text}</p>
@@ -59,9 +59,9 @@ export default function PublicLayout() {
   if (canon && publicUuid && canon !== publicUuid && canon.toLowerCase() === publicUuid.toLowerCase())
     return <Navigate to={{ pathname: location.pathname.replace(/^\/[^/]+/, `/${canon}`), search: location.search, hash: location.hash }} replace />
   if (error && /not found|invalid uuid|見つかりません/i.test(error)) return <SiteLayout><ErrorPage kind="user_not_found" /></SiteLayout>
-  if (error) return <Centered icon="bx-error-circle" text={error} />
+  if (error) return <SiteLayout><Centered icon="bx-error-circle" text={error} /></SiteLayout>
   if (!data) return <PageLoader />
-  if (!data.is_public || !data.profile || !data.stats) return <Centered icon="bx-lock-alt" text={tr('cn.private')} />
+  if (!data.is_public || !data.profile || !data.stats) return <SiteLayout><Centered icon="bx-lock-alt" text={tr('cn.private')} /></SiteLayout>
 
   const ctx: PublicCtx = { publicUuid: publicUuid!, profile: data.profile, stats: data.stats }
 

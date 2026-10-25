@@ -139,14 +139,25 @@ export default function RankingPage() {
       </div>
 
       {error && <div className="rounded-xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-300">{error}</div>}
-      {!data && !error && (
-        <div className="space-y-3">
-          <div className="grid gap-4 sm:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-56 rounded-3xl bg-d-med" />)}</div>
-          {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-16 rounded-xl bg-d-med" />)}
+      {(!data || (ranged && !rangeUsers)) && !error && (
+        <div className="overflow-hidden rounded-xl border border-d-border" aria-hidden>
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="flex items-center gap-3 border-b border-d-border px-3 py-3 last:border-b-0">
+              <Skeleton className="size-7 shrink-0 rounded-full bg-d-med" />
+              <Skeleton className="size-8 shrink-0 rounded-full bg-d-med" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <Skeleton className="h-3.5 w-32 max-w-full bg-d-med" />
+                <Skeleton className="h-3 w-20 max-w-full bg-d-med" />
+              </div>
+              <Skeleton className="h-4 w-10 shrink-0 bg-d-med" />
+              <Skeleton className="hidden h-4 w-10 shrink-0 bg-d-med sm:block" />
+              <Skeleton className="hidden h-4 w-10 shrink-0 bg-d-med sm:block" />
+            </div>
+          ))}
         </div>
       )}
 
-      {data && (
+      {data && !(ranged && !rangeUsers) && (
         <div key={tab + String(ranged)}>
           {rows.length === 0 && (!ranged || rangeUsers) && <p className="rounded-xl border border-dashed border-d-border p-10 text-center text-sm text-d-text3">{t('ranking.empty')}</p>}
           {rows.length > 0 && <RankTable rows={rows} cols={cols} defaultSort={tab} />}

@@ -9,7 +9,7 @@ import { useParams, Link } from 'react-router-dom'
 import { CONFIG } from '@/lib/config'
 import { useSession } from '@/lib/session'
 import { requiredStep, useOnboard } from '@/lib/onboard'
-import { Spinner } from '@/components/ui/spinner'
+import { PageLoader } from '@/components/ui/page-loader'
 
 interface SurveyResponseItem {
   id: number
@@ -107,10 +107,7 @@ export default function SurveyPage() {
     <div className="dash-scope min-h-screen bg-d-bg text-d-text">
       <div className="max-w-4xl mx-auto px-5 py-10">
         {loading ? (
-          <div className="py-20 text-center text-d-text3">
-            <Spinner className="mb-3" />
-            <p>{t('sv.loading')}</p>
-          </div>
+          <PageLoader />
         ) : error ? (
           <div className="bg-d-med border border-red-500/30 text-red-400 p-6 rounded-xl text-center">
             <p className="font-bold">{error}</p>

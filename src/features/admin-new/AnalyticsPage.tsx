@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { format } from 'date-fns'
-import { ArrowDownRight, ArrowUpRight, ExternalLink, RefreshCw, X } from 'lucide-react'
+import { ExternalLink, RefreshCw, X } from 'lucide-react'
 import Shell from './Shell'
 import { adminFetch, useDebounced } from '../admin/kit'
 import { LineChart, type LineChartDatum, type LineChartSeries } from '@/components/arc/line-chart/line-chart'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Delta, Empty, Pill, PageHead, Panel, rise } from './ui'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SimpleSelect } from '@/components/ui/simple-select'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
@@ -24,7 +24,7 @@ const PRESETS: [string, number][] = [['今日', 0], ['7日', 6], ['14日', 13], 
 const BUCKETS = [{ value: 'auto', label: '粒度: 自動' }, { value: 'hour', label: '1時間' }, { value: 'day', label: '日' }, { value: 'week', label: '週' }, { value: 'month', label: '月' }]
 // 指標 → 一覧画面
 const LIST: Record<string, string> = { access: 'access', api: 'api-logs', signups: 'users', errors: 'page-errors', api_errors: 'api-errors', mails: 'mails', actions: 'user-actions' }
-const SERIES_COLORS = ['var(--arc-accent)', '#4ade80', '#fbbf24', '#f87171', '#a78bfa', '#38bdf8', '#94a3b8']
+const SERIES_COLORS = ['var(--arc-accent)', 'var(--d-success)', 'var(--d-warning)', 'var(--d-danger)', 'var(--d-dev)', 'var(--d-accent-h)', 'var(--d-text3)']
 const nf = (n: number) => n.toLocaleString()
 
 function axisOf(l: string, bucket: Res['bucket']) {
@@ -78,26 +78,36 @@ export default function AnalyticsPage() {
     return { data, series }
   }, [res])
 
-  const change = res && res.prev_sum > 0 ? ((res.sum - res.prev_sum) / res.prev_sum) * 100 : null
   const dr = { from: new Date(from + 'T00:00:00'), to: new Date(to + 'T00:00:00') }
   const presetActive = (d: number) => to === jstToday() && from === shift(to, -d)
   const dimLabel = (k: string) => res?.dims.find((d) => d.key === k)?.label ?? k
 
+  const unit = { hour: '時間', day: '日', week: '週', month: '月' }[res?.bucket ?? 'day']
+  const metricTitle = res?.metrics.find((m) => m.key === res.metric)?.title ?? 'アクセス'
+  const cards: { l: string; v: string | null; sub: React.ReactNode }[] = [
+    { l: '期間合計', v: res ? nf(res.sum) : null, sub: res ? <span className="inline-flex items-center gap-1.5"><Delta now={res.sum} prev={res.prev_sum} good={metric.includes('error') ? 'down' : 'up'} /><span>前期間 <span className="tabular-nums">{nf(res.prev_sum)}</span></span></span> : '' },
+    { l: `平均 / ${unit}`, v: res ? nf(Math.round(res.avg * 10) / 10) : null, sub: res ? <span className="tabular-nums">{res.from} 〜 {res.to}</span> : '' },
+    { l: 'ピーク', v: res?.peak ? nf(res.peak.value) : res ? '-' : null, sub: res?.peak?.label ?? '' },
+  ]
+
   return (
-    <Shell title="詳細分析" actions={<Button variant="outline" size="sm" onClick={() => setTick((t) => t + 1)}><RefreshCw className={loading ? 'animate-spin' : ''} />更新</Button>}>
+    <Shell title="詳細分析" actions={<Button variant="ghost" size="icon" aria-label="更新" onClick={() => setTick((t) => t + 1)}><RefreshCw className={loading ? 'animate-spin' : ''} /></Button>}>
+      <PageHead title="詳細分析" desc="指標・期間・粒度を切り替えて、内訳をクリックで絞り込めます。">
+        {LIST[metric] && <Button variant="outline" size="sm" nativeButton={false} render={<Link to={`/admin-new/data/${LIST[metric]}`} />}><ExternalLink />生データ一覧</Button>}
+      </PageHead>
+
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="指標">
+        <div style={rise(0)} className="an-rise flex flex-wrap gap-1.5" role="tablist" aria-label="指標">
           {(res?.metrics ?? [{ key: 'access', title: 'アクセス' }]).map((m) => (
-            <button key={m.key} role="tab" aria-selected={metric === m.key} onClick={() => patch({ metric: m.key, group: null }, false)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${metric === m.key ? 'border-d-accent bg-d-accent/15 text-d-text' : 'border-d-border text-d-text2 hover:text-d-text'}`}>{m.title}</button>
+            <Pill key={m.key} role="tab" on={metric === m.key} onClick={() => patch({ metric: m.key, group: null }, false)}>{m.title}</Pill>
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex gap-1 rounded-full border border-d-border bg-d-med p-0.5">
+        <div style={rise(1)} className="an-rise flex flex-wrap items-center gap-2">
+          <div className="flex gap-0.5 rounded-full bg-d-light/60 p-0.5 shadow-[inset_0_0_0_1px_rgb(255_255_255/.06)]" role="group" aria-label="期間">
             {PRESETS.map(([l, d]) => (
-              <button key={l} onClick={() => patch({ from: shift(jstToday(), -d), to: jstToday() })}
-                className={`rounded-full px-3 py-1 text-xs transition-colors ${presetActive(d) ? 'bg-d-accent/20 text-d-text' : 'text-d-text2 hover:text-d-text'}`}>{l}</button>
+              <button key={l} type="button" aria-pressed={presetActive(d)} onClick={() => patch({ from: shift(jstToday(), -d), to: jstToday() })}
+                className={`an-press min-h-8 rounded-full px-3 text-xs tabular-nums ${presetActive(d) ? 'bg-d-accent/20 text-d-text' : 'text-d-text2 hover:text-d-text'}`}>{l}</button>
             ))}
           </div>
           <DateRangePicker value={dr} onChange={(v) => v?.from && patch({ from: format(v.from, 'yyyy-MM-dd'), to: format(v.to ?? v.from, 'yyyy-MM-dd') })} />
@@ -106,59 +116,51 @@ export default function AnalyticsPage() {
             <SimpleSelect value={group} onChange={(v) => patch({ group: v || null })} options={[{ value: '', label: '内訳で分割: なし' }, ...res.dims.map((d) => ({ value: d.key, label: `分割: ${d.label}` }))]} />
           )}
           {filters.map(([k, v]) => (
-            <button key={k} onClick={() => patch({ [k]: null })} className="inline-flex items-center gap-1 rounded-full border border-d-accent/40 bg-d-accent/10 px-2.5 py-1 text-xs text-d-text">
+            <button key={k} type="button" onClick={() => patch({ [k]: null })} aria-label={`${dimLabel(k.slice(2))}の絞り込みを解除`} className="an-press inline-flex min-h-8 items-center gap-1 rounded-full bg-d-accent/10 px-2.5 text-xs text-d-text shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--d-accent)_40%,transparent)]">
               {dimLabel(k.slice(2))}: <b className="max-w-40 truncate font-medium">{v}</b><X className="size-3" />
             </button>
           ))}
-          {LIST[metric] && <Button variant="ghost" size="sm" className="ml-auto" nativeButton={false} render={<Link to={`/admin-new/data/${LIST[metric]}`} />}><ExternalLink />生データ一覧</Button>}
         </div>
 
-        {err && <p className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">{err}</p>}
+        {err && <p role="alert" className="rounded-xl bg-d-danger/10 p-3 text-sm text-d-danger shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--d-danger)_35%,transparent)]">{err}</p>}
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          {[
-            { l: '期間合計', v: res ? nf(res.sum) : null, sub: change === null ? '前期間: 0' : <span className={`inline-flex items-center gap-0.5 ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{change >= 0 ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}{Math.abs(change).toFixed(0)}% <span className="text-d-text3">(前期間 {nf(res!.prev_sum)})</span></span> },
-            { l: `平均 / ${{ hour: '時間', day: '日', week: '週', month: '月' }[res?.bucket ?? 'day']}`, v: res ? nf(Math.round(res.avg * 10) / 10) : null, sub: res ? `${res.from} 〜 ${res.to}` : '' },
-            { l: 'ピーク', v: res?.peak ? nf(res.peak.value) : res ? '-' : null, sub: res?.peak?.label ?? '' },
-          ].map((c) => (
-            <Card key={c.l} className="gap-1 p-4">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {cards.map((c, n) => (
+            <Panel key={c.l} i={n + 2}>
               <p className="text-xs text-d-text3">{c.l}</p>
-              {c.v === null ? <Skeleton className="h-8 w-24" /> : <p className="text-2xl font-semibold tabular-nums text-d-text">{c.v}</p>}
-              <p className="text-xs text-d-text3">{c.sub}</p>
-            </Card>
+              {c.v === null ? <Skeleton className="mt-1 h-9 w-24" /> : <p className="mt-0.5 text-3xl font-medium tabular-nums tracking-tight text-d-text">{c.v}</p>}
+              <p className="mt-1 min-h-4 text-xs text-d-text3">{c.sub}</p>
+            </Panel>
           ))}
         </div>
 
-        <Card className="p-4">
-          {hover !== null && res && <p className="mb-1 text-xs text-d-text3">{res.labels[hover]}: <b className="text-d-text">{nf(res.total[hover])}</b></p>}
-          {res ? <LineChart data={data} series={series} label={res.metrics.find((m) => m.key === res.metric)?.title ?? ''} height={320} loading={loading} emptyLabel="この条件のデータはありません"
+        <Panel i={5} title={metricTitle} desc={hover !== null && res ? <><span className="tabular-nums">{res.labels[hover]}</span>: <b className="font-medium tabular-nums text-d-text2">{nf(res.total[hover])}</b></> : '線の上にカーソルを合わせると値を表示します'}>
+          {res ? <LineChart data={data} series={series} label={metricTitle} height={320} loading={loading} emptyLabel="この条件のデータはありません"
             onActiveChange={(i) => setHover(i)} categoryLabel="期間" /> : <Skeleton className="h-80 w-full" />}
-        </Card>
+        </Panel>
 
         {!!res?.dims.length && (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {res.dims.map((d) => {
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {res.dims.map((d, n) => {
               const rows = res.breakdowns[d.key] ?? []
               const max = Math.max(1, ...rows.map((r) => r.n))
               return (
-                <Card key={d.key} className="gap-2 p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-d-text">{d.label}</h3>
-                    <button className="text-xs text-d-text3 hover:text-d-text" onClick={() => patch({ group: group === d.key ? null : d.key })}>{group === d.key ? '分割を解除' : '分割して表示'}</button>
-                  </div>
-                  {rows.length === 0 && <p className="text-xs text-d-text3">データなし</p>}
-                  <ul className="flex flex-col gap-1">
+                <Panel key={d.key} i={n + 6} title={d.label} flush action={
+                  <button type="button" className="min-h-8 text-xs text-d-text3 hover:text-d-text" onClick={() => patch({ group: group === d.key ? null : d.key })}>{group === d.key ? '分割を解除' : '分割して表示'}</button>
+                }>
+                  {rows.length === 0 && <Empty>データなし</Empty>}
+                  <ul className="flex flex-col gap-0.5 px-1.5 pt-1">
                     {rows.map((r) => (
                       <li key={r.value}>
-                        <button onClick={() => patch({ ['f_' + d.key]: r.value })} title="クリックで絞り込み" className="group relative flex w-full items-center justify-between gap-2 overflow-hidden rounded-md px-2 py-1 text-left text-xs hover:bg-d-med">
-                          <span className="absolute inset-y-0 left-0 bg-d-accent/15" style={{ width: `${(r.n / max) * 100}%` }} />
+                        <button type="button" onClick={() => patch({ ['f_' + d.key]: r.value })} title="クリックで絞り込み" className="an-press group relative flex min-h-9 w-full items-center justify-between gap-2 overflow-hidden rounded-lg px-2.5 text-left text-xs hover:bg-d-light/60">
+                          <span aria-hidden className="absolute inset-y-1 left-0 rounded-r-md bg-d-accent/15 transition-[width] duration-500" style={{ width: `${(r.n / max) * 100}%` }} />
                           <span className="relative truncate text-d-text">{r.value}</span>
-                          <span className="relative tabular-nums text-d-text2">{nf(r.n)} <span className="text-d-text3">({res.sum ? Math.round((r.n / res.sum) * 100) : 0}%)</span></span>
+                          <span className="relative shrink-0 tabular-nums text-d-text2">{nf(r.n)} <span className="text-d-text3">({res.sum ? Math.round((r.n / res.sum) * 100) : 0}%)</span></span>
                         </button>
                       </li>
                     ))}
                   </ul>
-                </Card>
+                </Panel>
               )
             })}
           </div>

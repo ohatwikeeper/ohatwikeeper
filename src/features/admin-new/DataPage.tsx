@@ -24,6 +24,7 @@ import { IdentityOtp } from '../admin/IdentityOtp'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
 import { ALL_ITEMS } from './nav'
+import { Dot, Empty, PageHead, Pill, rise } from './ui'
 
 type Row = Record<string, unknown> & { __list: Record<string, unknown> }
 interface Filter { key: string; label: string; options: { value: string; label: string }[] }
@@ -88,9 +89,9 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
         </SheetHeader>
         <div className="flex flex-col gap-3 px-4 pb-6">
           {row && sum && (
-            <div className="grid grid-cols-4 gap-2 text-center text-xs text-d-text3">
+            <div className="grid grid-cols-2 gap-2 text-center text-xs text-d-text3 sm:grid-cols-4">
               {([['records', 'おはツイ'], ['short_links', '短縮URL'], ['feedbacks', 'FB'], ['access_30d', '30日アクセス']] as const).map(([k, l]) => (
-                <div key={k} className="rounded-lg bg-d-med/50 p-2"><p className="text-lg font-semibold tabular-nums text-d-text">{sum[k]?.toLocaleString()}</p>{l}</div>
+                <div key={k} className="rounded-xl bg-d-light/40 p-2.5 shadow-[inset_0_0_0_1px_rgb(255_255_255/.05)]"><p className="text-xl font-medium tabular-nums text-d-text">{sum[k]?.toLocaleString()}</p>{l}</div>
               ))}
             </div>
           )}
@@ -115,7 +116,7 @@ function Detail({ row, idx, total, view, res, onNav, onClose, onChanged, onEdit,
             const text = v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v)
             const rel = text && REL[k]?.(text)
             return (
-              <div key={k} className="rounded-lg border border-d-border p-2.5">
+              <div key={k} className="rounded-xl bg-d-light/40 p-3 shadow-[inset_0_0_0_1px_rgb(255_255_255/.05)]">
                 <div className="mb-1 flex items-center gap-1 text-xs text-d-text3">
                   <span>{lbl(k)}</span><code className="text-[10px] opacity-60">{k}</code>
                   <span className="ml-auto flex items-center">{rel && <Link to={rel.to} className="mr-1 text-xs !text-d-accent">{rel.label}</Link>}{text && <CopyBtn text={text} />}</span>
@@ -260,12 +261,13 @@ export default function DataPage() {
   const title = ALL_ITEMS.find((i) => i.to === `/admin-new/data/${view}`)?.label ?? res?.title ?? view
 
   return (
-    <Shell title={title} actions={LIVE.includes(view) ? <label className="hidden items-center gap-2 text-xs text-d-text2 sm:flex"><Switch checked={live} onCheckedChange={setLive} />ライブ</label> : null}>
+    <Shell title={title} actions={LIVE.includes(view) ? <label className="hidden min-h-9 items-center gap-2 text-xs text-d-text2 sm:flex"><Switch checked={live} onCheckedChange={setLive} />{live && <Dot tone="success" pulse />}ライブ</label> : null}>
+      <PageHead title={title} desc={res ? <span className="tabular-nums">{res.approx ? '約 ' : ''}{res.total.toLocaleString()} 件{res.title && res.title !== title ? ` ・ ${res.title}` : ''}</span> : '読み込み中'} />
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <div style={rise(0)} className="an-rise flex flex-wrap items-center gap-2">
           <div className="relative min-w-[220px] flex-1 sm:max-w-sm">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-d-text3" />
-            <Input value={qInput} onChange={(e) => setQInput(e.target.value)} placeholder="検索(ID・ユーザー名・リクエストID等)" className="h-9 pl-8" />
+            <Input value={qInput} onChange={(e) => setQInput(e.target.value)} placeholder="検索(ID・ユーザー名・リクエストID等)" className="h-9 rounded-lg bg-d-light/50 pl-8" />
           </div>
           {res?.dated && <DateRangePicker value={dr} onChange={(v) => patch({ from: v?.from ? format(v.from, 'yyyy-MM-dd') : null, to: v?.to ? format(v.to, 'yyyy-MM-dd') : null })} />}
           <Button variant="outline" size="sm" className="h-9 !text-d-text" onClick={() => patch({ dir: asc ? null : 'asc' })}>{asc ? <ArrowUpWideNarrow className="size-3.5" /> : <ArrowDownWideNarrow className="size-3.5" />}{sortCol ? (asc ? '昇順' : '降順') : asc ? '古い順' : '新しい順'}</Button>
@@ -291,16 +293,13 @@ export default function DataPage() {
         </div>
 
         {(res?.filters.length || res?.texts?.length) ? (
-          <div className="flex flex-col gap-2">
+          <div style={rise(1)} className="an-rise flex flex-col gap-2">
             {res.filters.filter((f) => f.options.length <= 6).map((f) => {
               const on = new Set((sp.get(f.key) ?? '').split(',').filter(Boolean))
               return (
                 <div key={f.key} className="flex flex-wrap items-center gap-1.5">
                   <span className="mr-1 text-xs text-d-text3">{FILTER_LABEL[f.key] ?? f.label}</span>
-                  {f.options.map((o) => (
-                    <button key={o.value} type="button" aria-pressed={on.has(o.value)} onClick={() => toggleFilter(f.key, o.value)}
-                      className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${on.has(o.value) ? 'border-d-accent bg-d-accent/15 text-d-text' : 'border-d-border text-d-text2 hover:bg-d-med/60'}`}>{o.label}</button>
-                  ))}
+                  {f.options.map((o) => <Pill key={o.value} on={on.has(o.value)} onClick={() => toggleFilter(f.key, o.value)}>{o.label}</Pill>)}
                 </div>
               )
             })}
@@ -308,27 +307,28 @@ export default function DataPage() {
           </div>
         ) : null}
 
-        <div className="flex items-center gap-2 text-xs text-d-text2">
-          <span>{res ? `${res.approx ? '約 ' : ''}${res.total.toLocaleString()} 件` : '読み込み中'}</span>
-          {active > 0 && <Badge variant="secondary">絞り込み {active}</Badge>}
-          {active > 0 && <button type="button" className="underline" onClick={() => { setQInput(''); setSp({}, { replace: true }) }}>すべて解除</button>}
-        </div>
+        {active > 0 && (
+          <div className="flex items-center gap-2 text-xs text-d-text2">
+            <Badge variant="secondary">絞り込み {active}</Badge>
+            <button type="button" className="min-h-8 underline underline-offset-2 hover:text-d-text" onClick={() => { setQInput(''); setSp({}, { replace: true }) }}>すべて解除</button>
+          </div>
+        )}
 
-        <div className="overflow-x-auto rounded-xl border border-d-border">
+        <div style={rise(2)} className="an-rise overflow-x-auto rounded-2xl bg-d-card shadow-[0_0_0_1px_rgb(255_255_255/.06),0_8px_24px_-12px_rgb(0_0_0/.5)]">
           <table className="w-full min-w-max text-sm">
-            <thead className="bg-d-med/50 text-left text-xs text-d-text2"><tr>{cur.map((c) => <th key={c} className="p-0 font-medium whitespace-nowrap" aria-sort={sortCol === c ? (asc ? 'ascending' : 'descending') : 'none'}><button type="button" onClick={() => sortBy(c)} className={`flex w-full items-center gap-1 px-3 py-2 text-left hover:bg-d-med/60 ${sortCol === c ? 'text-d-text' : ''}`}>{lbl(c)}{sortCol === c && (asc ? <ArrowUpWideNarrow className="size-3" /> : <ArrowDownWideNarrow className="size-3" />)}</button></th>)}</tr></thead>
-            <tbody className="divide-y divide-d-border">
+            <thead className="bg-d-med/70 text-left text-xs text-d-text2 shadow-[0_1px_0_rgb(255_255_255/.06)]"><tr>{cur.map((c) => <th key={c} className="p-0 font-medium whitespace-nowrap" aria-sort={sortCol === c ? (asc ? 'ascending' : 'descending') : 'none'}><button type="button" onClick={() => sortBy(c)} className={`flex min-h-10 w-full items-center gap-1 px-3 text-left transition-colors hover:bg-d-light/60 hover:text-d-text ${sortCol === c ? 'text-d-text' : ''}`}>{lbl(c)}{sortCol === c && (asc ? <ArrowUpWideNarrow className="size-3" /> : <ArrowDownWideNarrow className="size-3" />)}</button></th>)}</tr></thead>
+            <tbody className="divide-y divide-white/[.05]">
               {loading && !res ? Array.from({ length: 8 }, (_, i) => <tr key={i}><td colSpan={Math.max(1, cur.length)} className="p-2"><Skeleton className="h-8" /></td></tr>)
                 : res?.rows.map((r, i) => (
-                  <tr key={i} onClick={() => setSelIdx(i)} className="cursor-pointer transition-colors hover:bg-d-med/40">
-                    {cur.map((c) => <td key={c} className="max-w-[320px] truncate px-3 py-2"><Cell col={c} value={r.__list[c]} /></td>)}
+                  <tr key={i} onClick={() => setSelIdx(i)} className={`cursor-pointer transition-colors hover:bg-d-light/50 ${selIdx === i ? 'bg-d-accent/10' : ''}`}>
+                    {cur.map((c) => <td key={c} className="max-w-[320px] truncate px-3 py-2.5"><Cell col={c} value={r.__list[c]} /></td>)}
                   </tr>
                 ))}
             </tbody>
           </table>
-          {res && res.rows.length === 0 && <div className="flex flex-col items-center gap-2 py-16 text-d-text3"><Inbox className="size-8" /><p className="text-sm">該当するデータがありません</p></div>}
+          {res && res.rows.length === 0 && <Empty icon={Inbox}>該当するデータがありません</Empty>}
         </div>
-        {pages > 1 && <div className="flex justify-center"><Pagination page={page} pageCount={pages} onPageChange={(p) => patch({ page: p > 1 ? String(p) : null })} label="ページ" /></div>}
+        {pages > 1 && <div className="flex justify-center pt-1"><Pagination page={page} pageCount={pages} onPageChange={(p) => patch({ page: p > 1 ? String(p) : null })} label="ページ" /></div>}
       </div>
       <Detail row={sel} idx={selIdx} total={res?.rows.length ?? 0} view={view} res={res}
         onNav={(d) => setSelIdx((i) => (i === null || !res ? i : Math.min(res.rows.length - 1, Math.max(0, i + d))))}
@@ -343,7 +343,7 @@ export default function DataPage() {
                   {f.t === 'bool' ? (
                     <Label className="cursor-pointer gap-3"><Switch checked={!!form[f.k]} onCheckedChange={(c) => setForm({ ...form, [f.k]: c ? '1' : '' })} />{f.label}</Label>
                   ) : (<>
-                    <Label htmlFor={`f-${f.k}`}>{f.label}{f.req && <span className="text-red-400"> *</span>}</Label>
+                    <Label htmlFor={`f-${f.k}`}>{f.label}{f.req && <span className="text-d-danger"> *</span>}</Label>
                     {f.t === 'area' ? <Textarea id={`f-${f.k}`} rows={6} value={form[f.k]} onChange={(e) => setForm({ ...form, [f.k]: e.target.value })} />
                       : f.t === 'select' ? <SimpleSelect id={`f-${f.k}`} value={form[f.k]} onChange={(v) => setForm({ ...form, [f.k]: v })} options={f.opts!.map((o) => ({ value: o, label: STATUS_LABEL[o] ?? o }))} className="w-full" />
                       : <Input id={`f-${f.k}`} type={f.t === 'date' ? 'datetime-local' : f.t === 'num' ? 'number' : 'text'} value={form[f.k]} onChange={(e) => setForm({ ...form, [f.k]: e.target.value })} />}
