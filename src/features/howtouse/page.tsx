@@ -76,7 +76,7 @@ export default function HowToUsePage() {
   return (
     <div className="py-6">
       <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-8">
-        <aside className="lg:sticky lg:top-0 lg:max-h-[calc(100dvh-8rem)] lg:self-start lg:overflow-y-auto">
+        <aside className="lg:sticky lg:top-0 lg:max-h-[calc(100dvh-var(--navbar-real-h,0px)-4.5rem)] lg:overscroll-contain lg:self-start lg:overflow-y-auto">
           <button type="button" className="mb-3 flex w-full items-center justify-between rounded-lg border border-d-border px-3 py-2 text-xs font-semibold text-d-text2 lg:hidden"
             onClick={() => setTocOpen((v) => !v)} aria-expanded={tocOpen}>
             {tr('lp.toc')}<i className={`bx bx-chevron-down text-base transition-transform ${tocOpen ? 'rotate-180' : ''}`} />
