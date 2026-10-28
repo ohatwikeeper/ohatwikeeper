@@ -19,7 +19,7 @@ const ACCENT = 'var(--d-accent)'
 const EASE = [0.22, 1, 0.36, 1] as const
 const CLI_INSTALL = "npm i -g @ohatwikeeper/cli"
 const MARQUEE = ['tp.mqSave', 'tp.mqTimeline', 'tp.mqGrass', 'tp.mqAwards', 'tp.mqOgp', 'tp.mqBulk', 'tp.mqStreak', 'tp.mqRanking', 'tp.mqCli', 'tp.mqExt']
-const FAQ = [['tp.faqQ1', 'tp.faqA1'], ['tp.faqQ2', 'tp.faqA2'], ['tp.faqQ3', 'tp.faqA3']]
+const FAQ = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => [`tp.faqQ${n}`, `tp.faqA${n}`])
 const STEPS = [['tp.stepT1', 'tp.stepD1'], ['tp.stepT2', 'tp.stepD2'], ['tp.stepT3', 'tp.stepD3']]
 
 const authorName = (a: RankItem['author']) => {
@@ -283,6 +283,16 @@ export default function TopPage() {
             </Reveal>
           ))}
         </div>
+      </section>
+
+      {/* About */}
+      <section className="mx-auto max-w-3xl px-6 pb-28">
+        <Reveal>
+          <h2 className="text-4xl font-black leading-tight tracking-tight max-sm:text-3xl">{t('tp.aboutH')}</h2>
+          <div className="mt-8 space-y-5 text-base leading-loose text-white/65">
+            {['tp.aboutP1', 'tp.aboutP2', 'tp.aboutP3'].map((k) => <p key={k}>{t(k)}</p>)}
+          </div>
+        </Reveal>
       </section>
 
       {/* Features */}

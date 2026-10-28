@@ -52,6 +52,15 @@ const SECTIONS: { title: string; body: React.ReactNode[] }[] = [
       <li>X (Twitter) API / Discord API</li>
       <li>Google Fonts / Boxicons</li>
       <li>Analytics (Rybbit / Umami)</li>
+      <li>Google AdSense</li>
+    </ul>,
+  ] },
+  { title: '広告の配信とCookie', body: [
+    '本サービスは、第三者配信の広告サービス「Google AdSense」を利用しています。',
+    <ul key="l" className="list-disc space-y-2 pl-5">
+      <li><B>Cookieの利用:</B> Googleなどの第三者配信事業者は、Cookieを使用して、利用者が本サービスや他のウェブサイトに過去にアクセスした際の情報に基づいて広告を配信します。</li>
+      <li><B>パーソナライズ広告の無効化:</B> Googleが広告Cookieを使用することにより、Googleやそのパートナーは本サービスや他のサイトへのアクセス情報に基づいて広告を配信できます。利用者は<a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-d-text">広告設定</a>でパーソナライズ広告を無効にできます。また、<a href="https://www.aboutads.info/" target="_blank" rel="noopener noreferrer" className="underline hover:text-d-text">www.aboutads.info</a>で第三者配信事業者のCookieを無効にできます。</li>
+      <li><B>詳しい情報:</B> Googleによるデータの扱いは<a href="https://policies.google.com/technologies/ads?hl=ja" target="_blank" rel="noopener noreferrer" className="underline hover:text-d-text">広告に関するGoogleのポリシー</a>をご覧ください。</li>
     </ul>,
   ] },
   { title: '免責事項', body: [
@@ -76,7 +85,7 @@ export default function PolicyPage() {
   return (
     <div className="dash-scope min-h-screen bg-d-bg px-4 py-12 text-d-text sm:px-6">
       <div className="mx-auto max-w-3xl">
-        <PageHeader icon={ShieldCheck} title={tr('lp.policy')} desc={tr('lp.updated', { date: fmtD(2026, 3, 11) })} />
+        <PageHeader icon={ShieldCheck} title={tr('lp.policy')} desc={tr('lp.updated', { date: fmtD(2026, 10, 28) })} />
         <JaOnlyNotice className="mb-6" />
         <div className="space-y-8 text-sm leading-7 text-d-text2">
           <p>

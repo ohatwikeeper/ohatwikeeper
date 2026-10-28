@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin-new
+Disallow: /api/
+Disallow: /app-api/
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /confirm_login
+Disallow: /auth/
+Disallow: /onboard
+
+Sitemap: https://ohatwikeeper.com/sitemap.xml
