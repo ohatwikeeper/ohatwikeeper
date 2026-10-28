@@ -457,24 +457,75 @@ https://x.com/user/status/1111111111111111111`}</Code>
         </OL>
 
         <H2>CLI「ohax」</H2>
-        <P>ターミナルで、プロフィール、グラフ、草カレンダー、アワードを表示できます。インストール方法は3つあります。</P>
-        <H3>npm</H3>
+        <P>ohax は、ターミナルからおはツイKeeperを使うための公式CLIです。プロフィール、推移グラフ、草カレンダー、アワード、画像ギャラリーを文字と色で描画して表示します。ログインすれば、おはツイの登録・削除や、自分の記録の一覧もターミナルから行えます。</P>
+
+        <H3>インストール</H3>
+        <P>npm（Linux / macOS / Windows）では、OSとCPUに合ったビルド済みのバイナリが入ります。更新するときも同じコマンドを実行します。</P>
         <Code>{`npm i -g @ohatwikeeper/cli`}</Code>
-        <H3>Go</H3>
+        <P>Goが入っている場合は、次のコマンドでも入れられます。</P>
         <Code>{`go install github.com/lapius7/ohatwikeeper-cli/cmd/ohax@latest`}</Code>
-        <H3>シェルスクリプト（Linux / Mac）</H3>
+        <P>Goもnpmもない場合（Linux / macOS）は、インストールスクリプトを使います。バイナリは <C>~/.local/bin/ohax</C> に置かれます。置き場所は環境変数 <C>OHAX_INSTALL_DIR</C> で変えられます。</P>
         <Code>{`curl -fsSL https://ohatwikeeper.com/cli/install.sh | bash`}</Code>
-        <H3>コマンド</H3>
+        <P>Windowsでnpmを使わない場合は、<A href="https://ohatwikeeper.com/cli/dl/ohax-windows-amd64.exe">ohax-windows-amd64.exe</A> を直接ダウンロードします。</P>
+        <P>入ったかどうかは <C>ohax version</C> で確かめられます。引数なしの <C>ohax</C> でヘルプが出ます。</P>
+
+        <H3>記録を見る</H3>
+        <P>見たい人を指定して実行します。指定には公開ページのID（public_uuid）のほか、共有URLもそのまま使えます。URLにページ名が含まれていれば、そのページを表示します（例: <C>ohax https://tiskf.ohax.pw/graph</C>）。ログインしていれば、指定を省くと自分の記録を表示します。</P>
         <Table
           head={['コマンド', '内容']}
           rows={[
-            [<C key="a">ohax profile UUID</C>, 'プロフィールを表示'],
-            [<C key="b">ohax graph UUID</C>, 'いいね・表示の推移を文字で描画'],
-            [<C key="c">ohax grass UUID</C>, '草カレンダーを表示'],
-            [<C key="d">ohax awards UUID</C>, '獲得したアワードを表示'],
+            [<C key="a">ohax &lt;ユーザー&gt;</C>, 'プロフィール（アバター・統計・連続投稿・直近30日・最近の投稿）'],
+            [<C key="b">ohax profile</C>, 'ログイン中の自分のプロフィール'],
+            [<C key="c">ohax graph [ユーザー]</C>, 'いいね・インプレッション・リポスト・返信の推移グラフ'],
+            [<C key="d">ohax grass [ユーザー]</C>, '日ごとの投稿を草カレンダーで表示'],
+            [<C key="e">ohax awards [ユーザー]</C>, '獲得したアワードと次の目標'],
+            [<C key="f">ohax gallery [ユーザー]</C>, '画像ギャラリー（サムネイル付き）'],
+            [<C key="g">ohax all [ユーザー]</C>, 'プロフィールからギャラリーまでの5つをまとめて表示'],
+            [<C key="h">ohax rss [ユーザー]</C>, 'RSSフィード（XML）を出力'],
           ]}
         />
-        <P>設定の「APIキー」タブで発行したキーは、CLIや自作スクリプトでも使えます。</P>
+
+        <H3>ログインして記録を管理する</H3>
+        <P>おはツイの登録・削除と自分の記録の一覧には、Lapountでのログインが必要です。APIキーは要りません。事前に、おはツイKeeperの設定でLapountを連携しておいてください。</P>
+        <Table
+          head={['コマンド', '内容']}
+          rows={[
+            [<C key="a">ohax login</C>, '表示されたURLをブラウザで開き、コードを確かめて承認するとログイン完了'],
+            [<C key="b">ohax whoami</C>, 'ログイン中のアカウントを表示'],
+            [<C key="c">ohax list</C>, '自分の記録の一覧（非公開の記録も含む）'],
+            [<C key="d">ohax add &lt;ポストURL&gt;...</C>, 'おはツイを登録（URLを並べて複数まとめて登録できます）'],
+            [<C key="e">ohax rm &lt;ID または ポストURL&gt;...</C>, '記録を削除'],
+            [<C key="f">ohax logout</C>, 'ログアウト（保存したログイン情報を削除）'],
+          ]}
+        />
+        <P>ログイン情報は、Linuxでは <C>~/.config/ohax/config.json</C>（<C>$XDG_CONFIG_HOME</C> を設定していればその下）、macOSでは <C>~/Library/Application Support/ohax/</C>、Windowsでは <C>%AppData%\ohax\</C> に保存されます。</P>
+
+        <H3>ブラウザで開く</H3>
+        <Table
+          head={['コマンド', '内容']}
+          rows={[
+            [<C key="a">ohax open [ページ] [ユーザー]</C>, '公開ページをブラウザで開く（例: ohax open graph）'],
+            [<C key="b">ohax url [ページ] [ユーザー]</C>, 'ブラウザ用のURLを表示するだけで、開かない'],
+          ]}
+        />
+
+        <H3>オプション</H3>
+        <Table
+          head={['オプション', '内容']}
+          rows={[
+            [<C key="a">--days 90</C>, 'グラフを直近90日だけにする'],
+            [<C key="b">--weeks 12</C>, '草カレンダーを直近12週間だけにする（既定は画面幅に合わせる）'],
+            [<C key="c">--limit 30</C>, 'ギャラリーの件数（既定は12件）'],
+            [<C key="d">--no-images</C>, 'ギャラリーをサムネイルなしの一覧にする'],
+            [<C key="e">--width 80</C>, '表示幅を指定する'],
+            [<C key="f">-n / --no-color</C>, '色を付けない'],
+            [<C key="g">--color</C>, 'パイプやリダイレクト先でも色を付ける'],
+          ]}
+        />
+        <Note>
+          出力先が端末でないとき（パイプやファイルへのリダイレクト）や、環境変数 <C>NO_COLOR</C> を設定しているときは、自動で色とサムネイルを出さず、画像はURLで表示します。色の段階は端末から判定しますが、<C>OHAX_COLOR=truecolor</C>（ほかに <C>256</C>・<C>none</C>）で上書きできます。
+        </Note>
+        <P>インストールせずに表示系のコマンドを試すには <A href="/terminal">/terminal</A> を使います。設定の「APIキー」タブで発行するキーは、ブラウザ拡張や自作のスクリプトから公開APIを使うときのものです。</P>
 
         <H2>便利ツール（/tools）</H2>
         <Table
