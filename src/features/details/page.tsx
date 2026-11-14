@@ -1,3 +1,4 @@
+import { LinkifiedText } from '@/components/LinkifiedText'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { friendlyError } from '@/lib/dashboard/api'
@@ -105,7 +106,7 @@ export default function DetailsPage() {
                       <div className="mt-0.5 font-mono text-d-text">{r.date}</div>
                     </div>
                   </div>
-                  <p className="whitespace-pre-wrap text-base leading-relaxed">{r.text}</p>
+                  <p className="whitespace-pre-wrap text-base leading-relaxed"><LinkifiedText text={r.text} /></p>
                   {r.media_urls?.length > 0 && (
                     <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                       {r.media_urls.map((m, i) => (

@@ -1,3 +1,4 @@
+import { LinkifiedText } from '@/components/LinkifiedText'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useRef, useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
@@ -102,7 +103,7 @@ export default function RecordPanel({ record, index, total, onClose, onStep, onD
           {r && (
             <div className="flex-1 overflow-y-auto px-5 py-5">
               <Dialog.Title className="font-mono text-[11px] uppercase tracking-wider text-d-text3">{shortDate(r.date)}</Dialog.Title>
-              <p className="mt-2 whitespace-pre-wrap text-lg leading-relaxed">{r.text}</p>
+              <p className="mt-2 whitespace-pre-wrap text-lg leading-relaxed"><LinkifiedText text={r.text} /></p>
 
               {r.image_url && (
                 <button type="button" onClick={() => onImage(r.image_url!, r.video_url)} className="relative mt-4 block w-full overflow-hidden rounded-xl border border-d-border bg-d-med">

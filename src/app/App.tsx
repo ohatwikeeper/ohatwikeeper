@@ -53,6 +53,7 @@ const HowToUsePage = lazy(() => import('@/features/howtouse/page'))
 const RankingPage = lazy(() => import('@/features/ranking/page'))
 const CliPage = lazy(() => import('@/features/cli/page'))
 const RLinksPage = lazy(() => import('@/features/rlinks/page'))
+const LinkStatsSharePage = lazy(() => import('@/features/rlinks/share-page'))
 const NotificationDetailPage = lazy(() => import('@/features/notifications/detail'))
 const Graph3DPage = lazy(() => import('@/pages/public/Graph3DPage'))
 const NotificationsPage = lazy(() => import('@/features/notifications/page'))
@@ -103,6 +104,7 @@ function App() {
             <Route path="/onboard" element={<Suspense fallback={<PageLoader />}><OnboardPage /></Suspense>} />
             <Route path="/onboard/:step" element={<Suspense fallback={<PageLoader />}><OnboardPage /></Suspense>} />
             <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+            <Route path="/link-stats/:token" element={<Suspense fallback={<PageLoader />}><LinkStatsSharePage /></Suspense>} />
             <Route path="/auth/lapount/callback" element={<Suspense fallback={<PageLoader />}><LapountCallbackPage /></Suspense>} />
             <Route path="/confirm_login" element={<Suspense fallback={<PageLoader />}><ConfirmLoginPage /></Suspense>} />
           <Route path="/" element={<TopPage />} />

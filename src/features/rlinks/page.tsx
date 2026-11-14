@@ -1,7 +1,9 @@
+import { Flag } from '@/components/ui/flag'
+import ApiScopesDialog from './api-scopes'
 import i18n from '@/i18n'
 import { useTranslation } from 'react-i18next'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Link2Off, SearchX } from 'lucide-react'
+import { KeyRound, Link2Off, SearchX } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { confirmDialog } from '@/lib/confirm'
 import AppEmpty from '@/components/dashboard-ui/AppEmpty'
@@ -99,6 +101,7 @@ interface AccessLog {
   referrer: string
   is_bot: boolean
   flag: string
+  city?: string
   ref_domain: string
 }
 
@@ -131,6 +134,7 @@ export default function RLinksPage() {
 
   // Modals & Panels
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [apiOpen, setApiOpen] = useState(false)
   const [editingLink, setEditingLink] = useState<ShortLink | null>(null)
   const [qrModalLink, setQrModalLink] = useState<ShortLink | null>(null)
   const [logModalLink, setLogModalLink] = useState<ShortLink | null>(null)
@@ -192,6 +196,15 @@ export default function RLinksPage() {
               <Download className="w-4 h-4 text-d-text2" />
               {t('rl.csv')}
             </a>
+            <button
+              type="button"
+              onClick={() => setApiOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-d-border bg-d-med text-d-text transition-all text-xs font-semibold"
+            >
+              <KeyRound className="w-4 h-4 text-d-text2" />
+              {t('rs.api')}
+            </button>
+            <ApiScopesDialog open={apiOpen} onClose={() => setApiOpen(false)} />
 
             <Button variant="default"
               onClick={() => setIsCreateOpen(true)}
@@ -1092,10 +1105,10 @@ function AccessLogsModal({ link, onClose }: { link: ShortLink; onClose: () => vo
                         {log.accessed_at}
                       </TableCell>
                       <TableCell className="py-2.5 whitespace-nowrap">
-                        <span className="mr-1.5">{log.flag}</span>
+                        <Flag emoji={log.flag} className="mr-1.5" />
                         <span>{log.country || t('rl.unknown')}</span>
-                        {log.region && (
-                          <span className="text-d-text3 ml-1">({log.region})</span>
+                        {(log.city || log.region) && (
+                          <span className="text-d-text3 ml-1">({[log.city, log.region].filter((x, i, a) => x && a.indexOf(x) === i).join(', ')})</span>
                         )}
                       </TableCell>
                       <TableCell className="py-2.5 text-d-text2">
