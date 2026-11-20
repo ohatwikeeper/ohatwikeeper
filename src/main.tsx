@@ -41,7 +41,7 @@ if (RYBBIT_SRC && import.meta.env.PROD && RYBBIT_HOSTS.includes(location.hostnam
   el.dataset.skipPatterns = JSON.stringify(['/admin/**', '/admin-new/**', '/login', '/confirm_login', '/onboard/**', '/auth/**'])
   // 個別ID・コードを含むパスは、パターン名に置き換えて集計する(個人を特定しうる値を送らない)
   el.dataset.maskPatterns = JSON.stringify(['/notification/*', '/settings/webhook/**', '/tools/get_tweeturl/search/*', '/details/*', '/diff/*/*', '/u/*'])
-  el.dataset.tag = 'beta'
+  el.dataset.tag = location.hostname.startsWith('beta.') ? 'beta' : 'prod'
   el.dataset.debounce = '500'
   el.onload = reidentifyAnalytics
   document.head.appendChild(el)
